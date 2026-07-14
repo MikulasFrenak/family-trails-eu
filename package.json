@@ -1,0 +1,45 @@
+{
+  "name": "family-trails-eu",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive, family/kid-friendly map of castles, historical sites, nature spots, ZOOs, and family parks across Czechia and Slovakia (Poland/Hungary planned later). Built with React + Google Maps JavaScript API, deployed on Cloudflare Pages.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikulasFrenak/family-trails-eu.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MikulasFrenak/family-trails-eu/issues"
+  },
+  "homepage": "https://github.com/MikulasFrenak/family-trails-eu#readme",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "validate-poi": "tsx scripts/validate-poi.ts"
+  },
+  "dependencies": {
+    "@googlemaps/markerclusterer": "^2.6.2",
+    "@vis.gl/react-google-maps": "^1.9.0",
+    "i18next": "^26.3.6",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-i18next": "^17.0.9",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
+    "@types/google.maps": "^3.65.2",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "tailwindcss": "^4.3.2",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.4"
+  },
+  "packageManager": "pnpm@9.7.0+sha512.dc09430156b427f5ecfc79888899e1c39d2d690f004be70e05230b72cb173d96839587545d09429b55ac3c429c801b4dc3c0e002f653830a420fa2dd4e3cf9cf"
+}

@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "Family Trails"
+  },
+  "mapStyle": {
+    "playful": "Playful",
+    "nature": "Nature"
+  },
+  "categoryFilter": {
+    "all": "All"
+  },
+  "poiDetail": {
+    "close": "Close",
+    "kidFriendlyFrom": "Kid-friendly from age {{age}}",
+    "visitWebsite": "Visit website"
+  },
+  "mapLoadFallback": {
+    "title": "Map unavailable right now",
+    "message": "This is a small personal project running on a free tier — today's map quota is used up. Come back tomorrow!"
+  },
+  "searchBox": {
+    "placeholder": "Search a place…"
+  },
+  "mapLayers": {
+    "title": "Map layers",
+    "mapView": "Map view",
+    "terrain": "Terrain",
+    "roadmap": "Flat",
+    "satellite": "Satellite",
+    "satelliteNote": "These don't apply to satellite view — Google renders it as photo imagery only.",
+    "roads": "Roads",
+    "placeNames": "Town names",
+    "mountains": "Mountain names",
+    "rivers": "Rivers & lakes names"
+  }
+}

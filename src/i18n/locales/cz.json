@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "Rodinné výlety"
+  },
+  "mapStyle": {
+    "playful": "Hravá",
+    "nature": "Příroda"
+  },
+  "categoryFilter": {
+    "all": "Vše"
+  },
+  "poiDetail": {
+    "close": "Zavřít",
+    "kidFriendlyFrom": "Vhodné pro děti od {{age}} let",
+    "visitWebsite": "Navštívit web"
+  },
+  "mapLoadFallback": {
+    "title": "Mapa je momentálně nedostupná",
+    "message": "Jde o malý osobní projekt na bezplatném tarifu — dnešní limit pro mapu je vyčerpán. Zkuste to zítra!"
+  },
+  "searchBox": {
+    "placeholder": "Hledat místo…"
+  },
+  "mapLayers": {
+    "title": "Vrstvy mapy",
+    "mapView": "Zobrazení mapy",
+    "terrain": "Terén",
+    "roadmap": "Plochá",
+    "satellite": "Satelit",
+    "satelliteNote": "Tyto volby se u satelitního zobrazení neuplatní — Google jej vykresluje jen jako fotografický snímek.",
+    "roads": "Silnice",
+    "placeNames": "Názvy měst",
+    "mountains": "Názvy hor",
+    "rivers": "Názvy řek a jezer"
+  }
+}

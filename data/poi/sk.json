@@ -1,0 +1,590 @@
+[
+  {
+    "id": "sk-bojnice",
+    "category": "castle",
+    "country": "SK",
+    "region": "Trenčín Region",
+    "coordinates": { "lat": 48.7808, "lng": 18.5817 },
+    "name": { "en": "Bojnice Castle", "cz": "Zámek Bojnice", "sk": "Zámok Bojnice" },
+    "description": {
+      "en": "A fairy-tale castle with turrets and towers, home to the yearly Ghosts and Spooks festival.",
+      "cz": "Pohádkový zámek s věžičkami, každoročně hostí festival Strašidiel a strašidiel.",
+      "sk": "Rozprávkový zámok s vežičkami, každoročne hostí festival Strašidiel a strašidiel."
+    },
+    "kidFriendly": {
+      "minAge": 3,
+      "notes": { "en": "Zoo right next door, very stroller- and kid-friendly grounds." }
+    },
+    "tags": ["indoor", "guided-tour", "zoo-nearby"],
+    "externalUrl": "https://www.bojnicecastle.sk"
+  },
+  {
+    "id": "sk-bratislava-zoo",
+    "category": "zoo",
+    "country": "SK",
+    "region": "Bratislava",
+    "coordinates": { "lat": 48.1622, "lng": 17.0744 },
+    "name": { "en": "Bratislava Zoo", "cz": "Zoo Bratislava", "sk": "Zoo Bratislava" },
+    "description": {
+      "en": "A large zoo on the edge of the city with a big playground and miniature train.",
+      "cz": "Velká zoo na okraji města s velkým hřištěm a minivláčkem.",
+      "sk": "Veľká zoo na okraji mesta s veľkým ihriskom a mini vláčikom."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Stroller-friendly, playground and small train ride on site." }
+    },
+    "tags": ["outdoor", "playground-nearby", "stroller-friendly"],
+    "externalUrl": "https://www.zoobratislava.sk"
+  },
+  {
+    "id": "sk-slovak-paradise",
+    "category": "nature",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 48.9167, "lng": 20.4167 },
+    "name": { "en": "Slovak Paradise National Park", "cz": "Národní park Slovenský ráj", "sk": "Národný park Slovenský raj" },
+    "description": {
+      "en": "Gorges, ladders, and waterfalls to climb through — an adventure trail for older kids.",
+      "cz": "Rokle, žebříky a vodopády k prolézání — dobrodružná stezka pro starší děti.",
+      "sk": "Rokliny, rebríky a vodopády na prelezenie — dobrodružný chodník pre staršie deti."
+    },
+    "kidFriendly": {
+      "minAge": 8,
+      "notes": { "en": "Via-ferrata-style ladders and chains through gorges; not stroller-friendly." }
+    },
+    "tags": ["outdoor", "hiking", "not-stroller-friendly"],
+    "externalUrl": "https://www.slovensky-raj.sk"
+  },
+  {
+    "id": "sk-spis-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 49.0006, "lng": 20.7683 },
+    "name": { "en": "Spiš Castle", "cz": "Spišský hrad", "sk": "Spišský hrad" },
+    "description": {
+      "en": "One of the largest castle complexes in Central Europe, its ruins crowning a hill above the Spiš countryside.",
+      "cz": "Jeden z největších hradních komplexů ve střední Evropě, jehož zříceniny korunují kopec nad krajinou Spiše.",
+      "sk": "Jeden z najväčších hradných komplexov v strednej Európe, ktorého zrúcaniny korunujú kopec nad krajinou Spiša."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Steep uphill walk from the car park; open-air ruins, wear sturdy shoes." }
+    },
+    "tags": ["outdoor", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://www.spisskyhrad.com/english/spis-castle/"
+  },
+  {
+    "id": "sk-orava-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Žilina Region",
+    "coordinates": { "lat": 49.2612, "lng": 19.3578 },
+    "name": { "en": "Orava Castle", "cz": "Oravský hrad", "sk": "Oravský hrad" },
+    "description": {
+      "en": "A dramatic castle perched on a cliff above the Orava River, famous as a filming location for Nosferatu.",
+      "cz": "Impozantní hrad na skále nad řekou Oravou, proslulý jako filmové místo natáčení Nosferatu.",
+      "sk": "Impozantný hrad na skale nad riekou Oravou, preslávený ako filmové miesto nakrúcania Nosferatu."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Guided tour up a steep hill in stages; not suitable for strollers." }
+    },
+    "tags": ["guided-tour", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://www.oravskemuzeum.sk/en/exhibition/orava-castle/"
+  },
+  {
+    "id": "sk-demanovska-cave",
+    "category": "nature",
+    "country": "SK",
+    "region": "Žilina Region",
+    "coordinates": { "lat": 48.9986, "lng": 19.5819 },
+    "name": { "en": "Demänovská Cave of Liberty", "cz": "Demänovská jeskyně svobody", "sk": "Demänovská jaskyňa slobody" },
+    "description": {
+      "en": "The most-visited cave in Slovakia, with a guided walk past dripstone formations and an underground lake in the Low Tatras.",
+      "cz": "Nejnavštěvovanější jeskyně na Slovensku s prohlídkovou trasou kolem krápníkových útvarů a podzemního jezera v Nízkých Tatrách.",
+      "sk": "Najnavštevovanejšia jaskyňa na Slovensku s prehliadkovou trasou okolo kvapľových útvarov a podzemného jazera v Nízkych Tatrách."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Guided tour only, roughly an hour; steps and cool temperatures, so bring a jacket." }
+    },
+    "tags": ["guided-tour", "indoor", "not-stroller-friendly"],
+    "externalUrl": "https://www.ssj.sk"
+  },
+  {
+    "id": "sk-strbske-pleso",
+    "category": "nature",
+    "country": "SK",
+    "region": "Prešov Region",
+    "coordinates": { "lat": 49.1225, "lng": 20.0583 },
+    "name": { "en": "Štrbské Pleso, High Tatras", "cz": "Štrbské Pleso, Vysoké Tatry", "sk": "Štrbské Pleso, Vysoké Tatry" },
+    "description": {
+      "en": "A glacial lake ringed by an easy, flat lakeside path with High Tatra peaks reflected in the water.",
+      "cz": "Ledovcové jezero obklopené snadnou rovinatou stezkou kolem břehu, v jehož hladině se zrcadlí vrcholy Vysokých Tater.",
+      "sk": "Ľadovcové jazero obklopené jednoduchým rovinatým chodníkom okolo brehu, v ktorého hladine sa zrkadlia vrcholy Vysokých Tatier."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Flat lakeside promenade, stroller-friendly; longer trails into the mountains start from here for older kids." }
+    },
+    "tags": ["outdoor", "hiking", "stroller-friendly"],
+    "externalUrl": "https://www.strbskepleso.sk"
+  },
+  {
+    "id": "sk-domica-cave",
+    "category": "nature",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 48.4786, "lng": 20.4728 },
+    "name": { "en": "Domica Cave", "cz": "Jeskyně Domica", "sk": "Jaskyňa Domica" },
+    "description": {
+      "en": "A UNESCO-listed cave in the Slovak Karst, explored partly on foot and partly by a quiet underground boat ride.",
+      "cz": "Jeskyně zapsaná na seznamu UNESCO ve Slovenském krasu, kterou lze prozkoumat pěšky i tichou plavbou podzemní loďkou.",
+      "sk": "Jaskyňa zapísaná na zozname UNESCO v Slovenskom krase, ktorú možno preskúmať pešo aj tichou plavbou podzemnou loďkou."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Guided tour includes a boat ride; steady temperature year-round but not stroller-friendly." }
+    },
+    "tags": ["guided-tour", "not-stroller-friendly"],
+    "externalUrl": "https://www.ssj.sk"
+  },
+  {
+    "id": "sk-kosice-zoo",
+    "category": "zoo",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 48.7836, "lng": 21.2039 },
+    "name": { "en": "Košice Zoo", "cz": "Zoo Košice", "sk": "Zoo Košice" },
+    "description": {
+      "en": "The largest zoo in Slovakia, spread across forested hills with walking trails linking the animal enclosures.",
+      "cz": "Největší zoo na Slovensku, rozprostřená po zalesněných kopcích s procházkovými stezkami mezi výběhy zvířat.",
+      "sk": "Najväčšia zoo na Slovensku, rozprestretá po zalesnených kopcoch s prechádzkovými chodníkmi medzi výbehmi zvierat."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Hilly terrain, so a sturdy stroller helps; playgrounds and a small train ride on site." }
+    },
+    "tags": ["outdoor", "playground-nearby"],
+    "externalUrl": "https://www.zookosice.sk"
+  },
+  {
+    "id": "sk-tatralandia",
+    "category": "family-park",
+    "country": "SK",
+    "region": "Žilina Region",
+    "coordinates": { "lat": 49.1055, "lng": 19.5707 },
+    "name": { "en": "Tatralandia Aquapark", "cz": "Aquapark Tatralandia", "sk": "Aquapark Tatralandia" },
+    "description": {
+      "en": "A large aquapark at the foot of the Tatras, with indoor and outdoor pools, slides, and a children's water play area.",
+      "cz": "Velký aquapark na úpatí Tater s vnitřními i venkovními bazény, skluzavkami a dětským brouzdalištěm.",
+      "sk": "Veľký aquapark na úpätí Tatier s vnútornými aj vonkajšími bazénmi, šmykľavkami a detským bazénikom."
+    },
+    "kidFriendly": {
+      "minAge": 1,
+      "notes": { "en": "Dedicated shallow pool and slides for toddlers; open year-round thanks to thermal water." }
+    },
+    "tags": ["outdoor", "indoor", "stroller-friendly"],
+    "externalUrl": "https://www.tatralandia.sk"
+  },
+  {
+    "id": "sk-orava-village-museum",
+    "category": "historical-building",
+    "country": "SK",
+    "region": "Žilina Region",
+    "coordinates": { "lat": 49.2611, "lng": 19.6611 },
+    "name": { "en": "Museum of the Orava Village", "cz": "Muzeum oravské vesnice", "sk": "Múzeum oravskej dediny" },
+    "description": {
+      "en": "An open-air museum of over 50 original wooden Orava buildings, from farmhouses to a wooden church, set below the Western Tatras.",
+      "cz": "Skanzen s více než 50 původními dřevěnými stavbami z Oravy, od selských usedlostí po dřevěný kostel, pod Západními Tatrami.",
+      "sk": "Skanzen s viac ako 50 pôvodnými drevenými stavbami z Oravy, od sedliackych usadlostí po drevený kostol, pod Západnými Tatrami."
+    },
+    "kidFriendly": {
+      "minAge": 2,
+      "notes": { "en": "Mostly flat outdoor grounds, easy walking between houses; some interiors have steps." }
+    },
+    "tags": ["outdoor", "guided-tour"],
+    "externalUrl": "https://muzeum.zuberec.sk"
+  },
+  {
+    "id": "sk-vlkolinec",
+    "category": "historical-building",
+    "country": "SK",
+    "region": "Žilina Region",
+    "coordinates": { "lat": 49.0397, "lng": 19.2784 },
+    "name": { "en": "Vlkolínec", "cz": "Vlkolínec", "sk": "Vlkolínec" },
+    "description": {
+      "en": "A perfectly preserved mountain village of traditional wooden log houses, one of Slovakia's UNESCO World Heritage Sites.",
+      "cz": "Dokonale zachovaná horská vesnice tradičních dřevěných roubených domů, jedna ze slovenských památek UNESCO.",
+      "sk": "Dokonale zachovaná horská dedina tradičných drevených zrubových domov, jedna zo slovenských pamiatok UNESCO."
+    },
+    "kidFriendly": {
+      "minAge": 3,
+      "notes": { "en": "Uphill approach and gravel village lanes; not really stroller-friendly, but a short easy walk overall." }
+    },
+    "tags": ["outdoor", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://slovakia.travel/en/vlkolinec"
+  },
+  {
+    "id": "sk-levoca",
+    "category": "historical-building",
+    "country": "SK",
+    "region": "Prešov Region",
+    "coordinates": { "lat": 49.0300, "lng": 20.5900 },
+    "name": { "en": "Levoča Historic Town Centre", "cz": "Historické centrum Levoče", "sk": "Historické centrum Levoče" },
+    "description": {
+      "en": "A walled Gothic town with a wooden altar carved by Master Paul towering inside St James's Church on the main square.",
+      "cz": "Opevněné gotické město s dřevěným oltářem od Mistra Pavla, který se tyčí uvnitř kostela svatého Jakuba na hlavním náměstí.",
+      "sk": "Opevnené gotické mesto s dreveným oltárom od Majstra Pavla, ktorý sa týči vo vnútri Kostola svätého Jakuba na hlavnom námestí."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Cobbled square is stroller-manageable; church interior visits are via short guided entry." }
+    },
+    "tags": ["outdoor", "guided-tour"],
+    "externalUrl": "https://slovakia.travel/en/levoca"
+  },
+  {
+    "id": "sk-slovak-technical-museum",
+    "category": "museum",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 48.7218, "lng": 21.2574 },
+    "name": { "en": "Slovak Technical Museum", "cz": "Slovenské technické muzeum", "sk": "Slovenské technické múzeum" },
+    "description": {
+      "en": "A hands-on technical museum in Košice's old town with historic vehicles, a mining exhibit, and a mirror maze kids love.",
+      "cz": "Interaktivní technické muzeum ve starém městě v Košicích s historickými vozidly, hornickou expozicí a zrcadlovým bludištěm, které děti milují.",
+      "sk": "Interaktívne technické múzeum v starom meste v Košiciach s historickými vozidlami, banníckou expozíciou a zrkadlovým bludiskom, ktoré deti milujú."
+    },
+    "kidFriendly": {
+      "minAge": 3,
+      "notes": { "en": "Fully indoor, stroller-friendly; many exhibits are touch-and-try." }
+    },
+    "tags": ["indoor", "stroller-friendly"],
+    "externalUrl": "https://www.stm-ke.sk"
+  },
+  {
+    "id": "sk-banska-stiavnica",
+    "category": "historical-building",
+    "country": "SK",
+    "region": "Banská Bystrica Region",
+    "coordinates": { "lat": 48.4581, "lng": 18.8964 },
+    "name": { "en": "Banská Štiavnica Historic Town", "cz": "Historické město Banská Štiavnica", "sk": "Historické mesto Banská Štiavnica" },
+    "description": {
+      "en": "A UNESCO-listed former silver-mining town nestled in an old volcanic caldera, with a hilltop 'New Castle' and a mining open-air museum nearby.",
+      "cz": "Bývalé hornické město těžby stříbra zapsané na seznamu UNESCO, usazené v kráteru staré sopky, s Novým zámkem na kopci a nedalekým hornickým skanzenem.",
+      "sk": "Bývalé banícke mesto ťažby striebra zapísané na zozname UNESCO, usadené v kráteri starej sopky, s Novým zámkom na kopci a neďalekým banským skanzenom."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Hilly cobbled streets, not very stroller-friendly; the nearby open-air mining museum offers an underground guided tour for older kids." }
+    },
+    "tags": ["outdoor", "guided-tour", "not-stroller-friendly"],
+    "externalUrl": "https://slovakia.travel/en/banska-stiavnica"
+  },
+  {
+    "id": "sk-bojnice-zoo",
+    "category": "zoo",
+    "country": "SK",
+    "region": "Trenčín Region",
+    "coordinates": { "lat": 48.7806, "lng": 18.5769 },
+    "name": { "en": "Bojnice Zoo", "cz": "Zoo Bojnice", "sk": "Zoo Bojnice" },
+    "description": {
+      "en": "Slovakia's oldest and most-visited zoo, spread through parkland right next to the fairy-tale Bojnice Castle.",
+      "cz": "Nejstarší a nejnavštěvovanější zoo na Slovensku, rozložená v parku hned vedle pohádkového zámku Bojnice.",
+      "sk": "Najstaršia a najnavštevovanejšia zoo na Slovensku, rozložená v parku hneď vedľa rozprávkového zámku Bojnice."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Flat, stroller-friendly paths and a playground on site; easy to combine with the castle next door." }
+    },
+    "tags": ["outdoor", "stroller-friendly", "playground-nearby", "castle-nearby"],
+    "externalUrl": "https://zoobojnice.sk"
+  },
+  {
+    "id": "sk-spisska-nova-ves-zoo",
+    "category": "zoo",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 48.9328, "lng": 20.5747 },
+    "name": { "en": "Spišská Nová Ves Zoo", "cz": "Zoo Spišská Nová Ves", "sk": "Zoo Spišská Nová Ves" },
+    "description": {
+      "en": "A small regional zoo on the edge of town, popular with local families for its compact, easy-to-walk layout.",
+      "cz": "Malá regionální zoo na okraji města, oblíbená u místních rodin díky kompaktnímu a snadno schůdnému areálu.",
+      "sk": "Malá regionálna zoo na okraji mesta, obľúbená u miestnych rodín vďaka kompaktnému a ľahko schodnému areálu."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Small, flat, stroller-friendly grounds — a good option for a shorter visit with toddlers." }
+    },
+    "tags": ["outdoor", "stroller-friendly"],
+    "externalUrl": "https://zoosnv.sk"
+  },
+  {
+    "id": "sk-trencin-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Trenčín Region",
+    "coordinates": { "lat": 48.8942, "lng": 18.0447 },
+    "name": { "en": "Trenčín Castle", "cz": "Trenčínský hrad", "sk": "Trenčiansky hrad" },
+    "description": {
+      "en": "A dramatic hilltop castle towering over the town, with panoramic views from its well and towers and the legend of Omar and Fatima.",
+      "cz": "Dramatický hrad na kopci tyčící se nad městem, s výhledy z hradní studny a věží a legendou o Omarovi a Fatimě.",
+      "sk": "Dramatický hrad na kopci týčiaci sa nad mestom, s výhľadmi z hradnej studne a veží a legendou o Omarovi a Fatime."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Uphill cobbled paths and stairs throughout; short and long guided tour circuits available, not stroller-friendly." }
+    },
+    "tags": ["outdoor", "guided-tour", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://trencianskyhrad.sk"
+  },
+  {
+    "id": "sk-beckov-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Trenčín Region",
+    "coordinates": { "lat": 48.7909, "lng": 17.8981 },
+    "name": { "en": "Beckov Castle", "cz": "Hrad Beckov", "sk": "Hrad Beckov" },
+    "description": {
+      "en": "Ruins of a once-mighty castle perched on a sheer rock above the Váh river, with a museum exhibit and summer events in the lower courtyard.",
+      "cz": "Zříceniny kdysi mocného hradu na strmé skále nad řekou Váh, s muzejní expozicí a letními akcemi v dolním nádvoří.",
+      "sk": "Zrúcaniny kedysi mocného hradu na strmej skale nad riekou Váh, s múzejnou expozíciou a letnými podujatiami v dolnom nádvorí."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Staffed site with a ticket office and marked tour circuits, but steep rock paths and stairs — not stroller-friendly." }
+    },
+    "tags": ["outdoor", "guided-tour", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://www.hrad-beckov.sk/en"
+  },
+  {
+    "id": "sk-brekov-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Prešov Region",
+    "coordinates": { "lat": 48.9022, "lng": 21.8322 },
+    "name": { "en": "Brekov Castle", "cz": "Hrad Brekov", "sk": "Brekovský hrad" },
+    "description": {
+      "en": "A free-access ruin on a cone-shaped hill above the village of Brekov, reached by a marked trail from the train station.",
+      "cz": "Volně přístupná zřícenina na kuželovitém kopci nad obcí Brekov, dostupná po značené stezce od vlakové stanice.",
+      "sk": "Voľne prístupná zrúcanina na kužeľovitom kopci nad obcou Brekov, dostupná po značenom chodníku od vlakovej stanice."
+    },
+    "kidFriendly": {
+      "minAge": 7,
+      "notes": { "en": "No staff, tickets, or railings — steep unmarked ground near the walls; better suited to older kids used to hiking." }
+    },
+    "tags": ["outdoor", "free-access", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "http://www.brekov.eu"
+  },
+  {
+    "id": "sk-jasenov-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Prešov Region",
+    "coordinates": { "lat": 48.8911, "lng": 21.9106 },
+    "name": { "en": "Jasenov Castle", "cz": "Hrad Jasenov", "sk": "Jasenovský hrad" },
+    "description": {
+      "en": "A free-access ruin on a forested ridge of the Humenné hills, being gradually conserved by a local volunteer association.",
+      "cz": "Volně přístupná zřícenina na zalesněném hřebeni Humenských vrchů, postupně konzervovaná místním dobrovolnickým sdružením.",
+      "sk": "Voľne prístupná zrúcanina na zalesnenom hrebeni Humenských vrchov, postupne konzervovaná miestnym dobrovoľníckym združením."
+    },
+    "kidFriendly": {
+      "minAge": 7,
+      "notes": { "en": "Marked forest trail but a real climb with no infrastructure; not suitable for strollers or very young kids." }
+    },
+    "tags": ["outdoor", "free-access", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://www.jasenov.sk/institucie/zdruzenie-na-zachranu-jasenovskeho-hradu/"
+  },
+  {
+    "id": "sk-vinne-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 48.8161, "lng": 21.9522 },
+    "name": { "en": "Viniansky Castle", "cz": "Viniansky hrad", "sk": "Viniansky hrad" },
+    "description": {
+      "en": "A free-access hilltop ruin above the village of Vinné, most easily reached along the yellow trail from Vinné Lake.",
+      "cz": "Volně přístupná zřícenina na kopci nad obcí Vinné, nejsnazší přístup po žluté značené stezce od Vinianskeho jazera.",
+      "sk": "Voľne prístupná zrúcanina na kopci nad obcou Vinné, najjednoduchší prístup po žltej značenej ceste od Vinianskeho jazera."
+    },
+    "kidFriendly": {
+      "minAge": 6,
+      "notes": { "en": "Steep unmarked paths near the top and no facilities, but easy to combine with a swim at Vinné Lake below; not stroller-friendly." }
+    },
+    "tags": ["outdoor", "free-access", "uphill-walk", "not-stroller-friendly", "lake-nearby"],
+    "externalUrl": "https://www.hrady-zamky.sk/en/viniansky-hrad/"
+  },
+  {
+    "id": "sk-saris-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Prešov Region",
+    "coordinates": { "lat": 49.0525, "lng": 21.1761 },
+    "name": { "en": "Šariš Castle", "cz": "Šarišský hrad", "sk": "Šarišský hrad" },
+    "description": {
+      "en": "One of the largest castle ruins in Slovakia, crowning a nature-reserve hill above Veľký Šariš with views to a dozen surrounding castles.",
+      "cz": "Jedna z největších hradních zřícenin na Slovensku, korunující kopec s přírodní rezervací nad Veľkým Šarišom s výhledem na desítku okolních hradů.",
+      "sk": "Jedna z najväčších hradných zrúcanín na Slovensku, korunujúca kopec s prírodnou rezerváciou nad Veľkým Šarišom s výhľadom na desiatku okolitých hradov."
+    },
+    "kidFriendly": {
+      "minAge": 6,
+      "notes": { "en": "Access road doubles as a nature trail with information panels; free access but a real uphill walk, not stroller-friendly." }
+    },
+    "tags": ["outdoor", "free-access", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://www.sarisskahradnacesta.sk/pamiatka/hrad-saris/"
+  },
+  {
+    "id": "sk-driny-cave",
+    "category": "nature",
+    "country": "SK",
+    "region": "Trnava Region",
+    "coordinates": { "lat": 48.5013, "lng": 17.4039 },
+    "name": { "en": "Driny Cave", "cz": "Jeskyně Driny", "sk": "Jaskyňa Driny" },
+    "description": {
+      "en": "The only show cave in western Slovakia, tucked into the Malé Karpaty hills near Smolenice, with a short guided walk past dripstone columns and curtains.",
+      "cz": "Jediná zpřístupněná jeskyně na západním Slovensku, ukrytá v kopcích Malých Karpat u Smolenic, nabízí krátkou prohlídku kolem krápníkových sloupů a záclon.",
+      "sk": "Jediná sprístupnená jaskyňa na západnom Slovensku, ukrytá v kopcoch Malých Karpát pri Smoleniciach, ponúka krátku prehliadku okolo kvapľových stĺpov a záclon."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Guided tour only, about 30-40 minutes with some steps; cool inside year-round (around 8-9°C), so bring a light jacket." }
+    },
+    "tags": ["guided-tour", "indoor", "not-stroller-friendly"],
+    "externalUrl": "https://www.ssj.sk"
+  },
+  {
+    "id": "sk-slavin",
+    "category": "historical-building",
+    "country": "SK",
+    "region": "Bratislava",
+    "coordinates": { "lat": 48.1525, "lng": 17.1004 },
+    "name": { "en": "Slavín Memorial", "cz": "Památník Slavín", "sk": "Pamätník Slavín" },
+    "description": {
+      "en": "A vast WWII memorial and cemetery on a hilltop above Bratislava's Old Town, with wide plazas and sweeping city views kids can run around in.",
+      "cz": "Rozlehlý památník a hřbitov z druhé světové války na kopci nad Starým Městem v Bratislavě, s širokými plochami a výhledy na město, kde si děti mohou zaběhat.",
+      "sk": "Rozľahlý pamätník a cintorín z druhej svetovej vojny na kopci nad bratislavským Starým Mestom, s priestrannými plochami a výhľadmi na mesto, kde sa deti môžu vybehať."
+    },
+    "kidFriendly": {
+      "minAge": 2,
+      "notes": { "en": "Flat paved plazas and open lawns are easy with a stroller; it's an active memorial and cemetery, so keep play respectful and quiet near the monument itself." }
+    },
+    "tags": ["outdoor", "free-access", "stroller-friendly"],
+    "externalUrl": "https://www.visitbratislava.com/places/slavin/"
+  },
+  {
+    "id": "sk-bratislava-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Bratislava",
+    "coordinates": { "lat": 48.1423, "lng": 17.0998 },
+    "name": { "en": "Bratislava Castle", "cz": "Bratislavský hrad", "sk": "Bratislavský hrad" },
+    "description": {
+      "en": "The city's white, table-shaped landmark high above the Danube, with a huge courtyard to explore and terraces looking out over three countries.",
+      "cz": "Bílá, stolu podobná dominanta města vysoko nad Dunajem, s obrovským nádvořím k prozkoumání a terasami s výhledem do tří zemí.",
+      "sk": "Biela, stolu podobná dominanta mesta vysoko nad Dunajom, s obrovským nádvorím na preskúmanie a terasami s výhľadom do troch krajín."
+    },
+    "kidFriendly": {
+      "minAge": 2,
+      "notes": { "en": "Courtyard and outer terraces are flat and stroller-friendly; the History Museum inside has stairs between floors." }
+    },
+    "tags": ["outdoor", "indoor", "stroller-friendly"],
+    "externalUrl": "http://www.bratislava-hrad.sk/"
+  },
+  {
+    "id": "sk-kamzik",
+    "category": "family-park",
+    "country": "SK",
+    "region": "Bratislava",
+    "coordinates": { "lat": 48.1825, "lng": 17.0947 },
+    "name": { "en": "Kamzík Hill", "cz": "Kamzík", "sk": "Kamzík" },
+    "description": {
+      "en": "A forested hill above Bratislava topped by a TV tower, home to Slovakia's first summer bobsled track, running through the trees since 1996.",
+      "cz": "Zalesněný kopec nad Bratislavou s televizní věží na vrcholu, domov první letní bobové dráhy na Slovensku, která se mezi stromy jezdí od roku 1996.",
+      "sk": "Zalesnený kopec nad Bratislavou s televíznou vežou na vrchole, domov prvej letnej bobovej dráhy na Slovensku, ktorá sa medzi stromami jazdí od roku 1996."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "The summer bobsled track has a minimum height for riding alone (younger kids can ride tandem with an adult); check current limits on site." }
+    },
+    "tags": ["outdoor", "forest", "bobsled-track"],
+    "externalUrl": "https://www.bobodraha.sk/"
+  },
+  {
+    "id": "sk-zelezna-studnicka",
+    "category": "nature",
+    "country": "SK",
+    "region": "Bratislava",
+    "coordinates": { "lat": 48.1901, "lng": 17.0820 },
+    "name": { "en": "Železná studnička", "cz": "Železná studienka", "sk": "Železná studnička" },
+    "description": {
+      "en": "A shaded valley in Bratislava's forest park and a classic starting point for family walks into the Malé Karpaty, with a large playground next door at Partizánska lúka.",
+      "cz": "Stinné údolí v bratislavském lesoparku a klasický výchozí bod pro rodinné procházky do Malých Karpat, s velkým hřištěm hned vedle na Partizánské louce.",
+      "sk": "Tienisté údolie v bratislavskom lesoparku a klasický východiskový bod pre rodinné prechádzky do Malých Karpát, s veľkým ihriskom hneď vedľa na Partizánskej lúke."
+    },
+    "kidFriendly": {
+      "minAge": 1,
+      "notes": { "en": "Wide gravel paths from the tram terminus are manageable with a stroller; the playground at neighbouring Partizánska lúka has separate zones for toddlers and older kids." }
+    },
+    "tags": ["outdoor", "forest", "playground-nearby", "stroller-friendly"]
+  },
+  {
+    "id": "sk-betliar",
+    "category": "castle",
+    "country": "SK",
+    "region": "Košice Region",
+    "coordinates": { "lat": 48.7061, "lng": 20.5104 },
+    "name": { "en": "Betliar Manor House", "cz": "Zámek Betliar", "sk": "Kaštieľ Betliar" },
+    "description": {
+      "en": "The Andrássy family's manor house, the only Slovak castle with its original furnishings intact since 1945, set in a vast English park with ponds and follies to wander.",
+      "cz": "Zámek rodu Andrássyovců, jediný slovenský zámek se zachovaným původním vybavením z roku 1945, obklopený rozlehlým anglickým parkem s rybníky a romantickými stavbami k procházení.",
+      "sk": "Kaštieľ rodu Andrássyovcov, jediný slovenský kaštieľ so zachovaným pôvodným vybavením z roku 1945, obklopený rozľahlým anglickým parkom s rybníkmi a romantickými stavbami na prechádzanie."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "The park's flat gravel paths are stroller-friendly and free to explore; the manor interior is guided-tour only and involves stairs between rooms." }
+    },
+    "tags": ["guided-tour", "outdoor", "indoor"],
+    "externalUrl": "http://muzeumbetliar.sk/"
+  },
+  {
+    "id": "sk-biofarma-stupava",
+    "category": "family-park",
+    "country": "SK",
+    "region": "Bratislava Region",
+    "coordinates": { "lat": 48.3057, "lng": 17.0433 },
+    "name": { "en": "Biofarma Príroda", "cz": "Biofarma Příroda", "sk": "Biofarma Príroda" },
+    "description": {
+      "en": "An organic farm between Stupava and the Small Carpathian forests where horses, sheep, and goats roam free for kids to meet and pet, alongside orchards and a nature trail.",
+      "cz": "Ekologická farma mezi Stupavou a lesy Malých Karpat, kde se mezi ovocnými sady a naučnou stezkou volně pohybují koně, ovce a kozy, které si děti mohou pohladit.",
+      "sk": "Ekologická farma medzi Stupavou a lesmi Malých Karpát, kde sa medzi ovocnými sadmi a náučným chodníkom voľne pohybujú kone, ovce a kozy, ktoré si deti môžu pohladiť."
+    },
+    "kidFriendly": {
+      "minAge": 1,
+      "notes": { "en": "Farmland is grassy and uneven with animals roaming freely — a carrier works better than a stroller; there's a restaurant on site for a family break." }
+    },
+    "tags": ["outdoor", "not-stroller-friendly"],
+    "externalUrl": "https://biofarma.sk"
+  },
+  {
+    "id": "sk-bradlo-mohyla",
+    "category": "historical-building",
+    "country": "SK",
+    "region": "Trenčín Region",
+    "coordinates": { "lat": 48.6792, "lng": 17.5636 },
+    "name": { "en": "Štefánik's Mound, Bradlo", "cz": "Štefánikova mohyla, Bradlo", "sk": "Mohyla M. R. Štefánika, Bradlo" },
+    "description": {
+      "en": "A monumental stone mound crowning Bradlo hill in honour of General Milan Rastislav Štefánik, with wide views over the rolling Myjavské kopanice hills.",
+      "cz": "Monumentální kamenná mohyla na vrcholu kopce Bradlo na počest generála Milana Rastislava Štefánika, s širokým výhledem na kopcovitou krajinu Myjavských kopanic.",
+      "sk": "Monumentálna kamenná mohyla na vrchole kopca Bradlo na počesť generála Milana Rastislava Štefánika, so širokým výhľadom na kopcovitú krajinu Myjavských kopaníc."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "Short but noticeably uphill walk from the car park to the monument on an open, often windy hilltop; not stroller-friendly." }
+    },
+    "tags": ["outdoor", "free-access", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://www.bradlo.sk/"
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "zoo",
+    "label": { "en": "Zoo", "cz": "ZOO", "sk": "ZOO" },
+    "color": "#F2545B",
+    "emoji": "🦁",
+    "icon": "zoo.svg"
+  },
+  {
+    "id": "castle",
+    "label": { "en": "Castle", "cz": "Hrad / zámek", "sk": "Hrad / zámok" },
+    "color": "#E08A3E",
+    "emoji": "🏰",
+    "icon": "castle.svg"
+  },
+  {
+    "id": "nature",
+    "label": { "en": "Nature & trails", "cz": "Příroda a stezky", "sk": "Príroda a chodníky" },
+    "color": "#2FAE66",
+    "emoji": "🌲",
+    "icon": "nature.svg"
+  },
+  {
+    "id": "museum",
+    "label": { "en": "Museum", "cz": "Muzeum", "sk": "Múzeum" },
+    "color": "#4C7DE0",
+    "emoji": "🖼️",
+    "icon": "museum.svg"
+  },
+  {
+    "id": "historical-building",
+    "label": { "en": "Historical site", "cz": "Historická památka", "sk": "Historická pamiatka" },
+    "color": "#9B6FD1",
+    "emoji": "🏛️",
+    "icon": "historical-building.svg"
+  },
+  {
+    "id": "family-park",
+    "label": { "en": "Family park", "cz": "Zábavní park", "sk": "Zábavný park" },
+    "color": "#EC5FA3",
+    "emoji": "🎡",
+    "icon": "family-park.svg"
+  }
+]
