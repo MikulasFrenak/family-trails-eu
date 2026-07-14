@@ -1,0 +1,306 @@
+[
+  {
+    "id": "cz-krivoklat",
+    "category": "castle",
+    "country": "CZ",
+    "region": "Central Bohemia",
+    "coordinates": { "lat": 50.0356, "lng": 13.8656 },
+    "name": { "en": "Křivoklát Castle", "cz": "Hrad Křivoklát", "sk": "Hrad Křivoklát" },
+    "description": {
+      "en": "A royal hunting castle deep in the forest, with a dragon-themed trail for kids.",
+      "cz": "Královský lovecký hrad uprostřed lesa s dračí stezkou pro děti.",
+      "sk": "Kráľovský poľovnícky hrad uprostred lesa s dračím chodníkom pre deti."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "Short tour route, dragon-themed kids trail nearby." }
+    },
+    "tags": ["indoor", "guided-tour", "forest"],
+    "externalUrl": "https://www.krivoklat.cz"
+  },
+  {
+    "id": "cz-prague-zoo",
+    "category": "zoo",
+    "country": "CZ",
+    "region": "Prague",
+    "coordinates": { "lat": 50.1171, "lng": 14.4085 },
+    "name": { "en": "Prague Zoo", "cz": "Zoo Praha", "sk": "Zoo Praha" },
+    "description": {
+      "en": "One of the world's best-rated zoos, with a cable car over the enclosures.",
+      "cz": "Jedna z nejlépe hodnocených zoo na světě, s lanovkou nad výběhy.",
+      "sk": "Jedna z najlepšie hodnotených zoo na svete, s lanovkou nad výbehmi."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Stroller-friendly, playgrounds throughout, cable car kids love." }
+    },
+    "tags": ["outdoor", "playground-nearby", "stroller-friendly"],
+    "externalUrl": "https://www.zoopraha.cz"
+  },
+  {
+    "id": "cz-karlstejn",
+    "category": "castle",
+    "country": "CZ",
+    "region": "Central Bohemia",
+    "coordinates": { "lat": 49.9392, "lng": 14.1878 },
+    "name": { "en": "Karlštejn Castle", "cz": "Hrad Karlštejn", "sk": "Hrad Karlštejn" },
+    "description": {
+      "en": "A dramatic hilltop castle founded by Charles IV, visible from the village below.",
+      "cz": "Impozantní hrad na kopci, založený Karlem IV., viditelný z podhradí.",
+      "sk": "Impozantný hrad na kopci, založený Karolom IV., viditeľný z podhradia."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Uphill walk from the village; guided tour only, book ahead in summer." }
+    },
+    "tags": ["guided-tour", "uphill-walk"],
+    "externalUrl": "https://www.hrad-karlstejn.cz"
+  },
+  {
+    "id": "cz-safari-park-dvur-kralove",
+    "category": "zoo",
+    "country": "CZ",
+    "region": "Hradec Králové Region",
+    "coordinates": { "lat": 50.4310, "lng": 15.8114 },
+    "name": { "en": "Safari Park Dvůr Králové", "cz": "Safari Park Dvůr Králové", "sk": "Safari Park Dvůr Králové" },
+    "description": {
+      "en": "A vast African-themed safari park where you can drive or ride a bus right through open enclosures of giraffes, zebras and rhinos.",
+      "cz": "Rozlehlý africký safari park, kterým můžete projet autem nebo safari busem přímo mezi žirafami, zebrami a nosorožci.",
+      "sk": "Rozľahlý africký safari park, ktorým môžete prejsť autom alebo safari busom priamo medzi žirafami, zebrami a nosorožcami."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Drive-through safari route plus a walking zoo section; strollers welcome, playground on site." }
+    },
+    "tags": ["outdoor", "playground-nearby", "stroller-friendly"],
+    "externalUrl": "https://safaripark.cz"
+  },
+  {
+    "id": "cz-zoo-ostrava",
+    "category": "zoo",
+    "country": "CZ",
+    "region": "Moravian-Silesian Region",
+    "coordinates": { "lat": 49.8456, "lng": 18.3250 },
+    "name": { "en": "Ostrava Zoo", "cz": "Zoo Ostrava", "sk": "Zoo Ostrava" },
+    "description": {
+      "en": "The second-largest zoo in the Czech Republic, with a Japanese garden, pavilion of evolution, and wide paths good for pushchairs.",
+      "cz": "Druhá největší zoo v Česku, s japonskou zahradou, pavilonem evoluce a širokými cestami vhodnými pro kočárky.",
+      "sk": "Druhá najväčšia zoo v Česku, s japonskou záhradou, pavilónom evolúcie a širokými cestami vhodnými pre kočíky."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Flat, stroller-friendly paths; petting zoo and playgrounds for younger kids." }
+    },
+    "tags": ["outdoor", "playground-nearby", "stroller-friendly"],
+    "externalUrl": "https://www.zoo-ostrava.cz"
+  },
+  {
+    "id": "cz-lednice-chateau",
+    "category": "castle",
+    "country": "CZ",
+    "region": "South Moravia",
+    "coordinates": { "lat": 48.7997, "lng": 16.8033 },
+    "name": { "en": "Lednice Chateau", "cz": "Zámek Lednice", "sk": "Zámok Lednice" },
+    "description": {
+      "en": "A fairy-tale neo-Gothic chateau surrounded by parkland, ponds and a minaret, part of the Lednice-Valtice UNESCO landscape.",
+      "cz": "Pohádkový novogotický zámek obklopený parkem, rybníky a minaretem, součást památky UNESCO Lednicko-valtický areál.",
+      "sk": "Rozprávkový novogotický zámok obklopený parkom, rybníkmi a minaretom, súčasť pamiatky UNESCO Lednicko-valtický areál."
+    },
+    "kidFriendly": {
+      "minAge": 3,
+      "notes": { "en": "Grounds are stroller-friendly and great for a picnic; castle interior is a short guided tour." }
+    },
+    "tags": ["outdoor", "guided-tour", "stroller-friendly"],
+    "externalUrl": "https://www.zamek-lednice.com"
+  },
+  {
+    "id": "cz-bouzov-castle",
+    "category": "castle",
+    "country": "CZ",
+    "region": "Olomouc Region",
+    "coordinates": { "lat": 49.7044, "lng": 16.8897 },
+    "name": { "en": "Bouzov Castle", "cz": "Hrad Bouzov", "sk": "Hrad Bouzov" },
+    "description": {
+      "en": "A romantic turreted castle used in fairy-tale films, tucked into rolling countryside between Litovel and Mohelnice.",
+      "cz": "Romantický hrad s věžičkami, který si zamilovali filmaři pohádek, ukrytý v mírně zvlněné krajině mezi Litovlí a Mohelnicí.",
+      "sk": "Romantický hrad s vežičkami, ktorý si obľúbili filmári rozprávok, ukrytý v mierne zvlnenej krajine medzi Litovľou a Mohelnicou."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "Guided tour only; a fairy-tale-style route aimed at families is available in season." }
+    },
+    "tags": ["indoor", "guided-tour"],
+    "externalUrl": "https://www.hrad-bouzov.cz"
+  },
+  {
+    "id": "cz-techmania",
+    "category": "museum",
+    "country": "CZ",
+    "region": "Plzeň Region",
+    "coordinates": { "lat": 49.7400, "lng": 13.3600 },
+    "name": { "en": "Techmania Science Center", "cz": "Techmania Science Center", "sk": "Techmania Science Center" },
+    "description": {
+      "en": "A hands-on science center in former Škoda factory halls, packed with interactive experiments and a 3D planetarium.",
+      "cz": "Interaktivní vědecké centrum v bývalých halách Škodovky, plné pokusů na hraní a 3D planetária.",
+      "sk": "Interaktívne vedecké centrum v bývalých halách Škodovky, plné pokusov na hranie a 3D planetária."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "Fully indoor and stroller-friendly; exhibits are designed for hands-on kids." }
+    },
+    "tags": ["indoor", "stroller-friendly"],
+    "externalUrl": "https://techmania.cz"
+  },
+  {
+    "id": "cz-iqlandia-liberec",
+    "category": "museum",
+    "country": "CZ",
+    "region": "Liberec Region",
+    "coordinates": { "lat": 50.7550, "lng": 15.0533 },
+    "name": { "en": "iQLANDIA Liberec", "cz": "iQLANDIA Liberec", "sk": "iQLANDIA Liberec" },
+    "description": {
+      "en": "A four-floor science playground with more than 400 interactive exhibits, a planetarium, and a giant slide down the atrium.",
+      "cz": "Čtyřpodlažní vědecké hřiště s více než 400 interaktivními exponáty, planetáriem a obřím skluzem přes celé atrium.",
+      "sk": "Štvorpodlažné vedecké ihrisko s viac ako 400 interaktívnymi exponátmi, planetáriom a obrovským šmykľavkom cez celé átrium."
+    },
+    "kidFriendly": {
+      "minAge": 3,
+      "notes": { "en": "Indoor and stroller-friendly, with a dedicated toddler zone (iQPLAYground)." }
+    },
+    "tags": ["indoor", "stroller-friendly"],
+    "externalUrl": "https://iqlandia.cz"
+  },
+  {
+    "id": "cz-moravian-karst",
+    "category": "nature",
+    "country": "CZ",
+    "region": "South Moravia",
+    "coordinates": { "lat": 49.3708, "lng": 16.7261 },
+    "name": { "en": "Moravian Karst & Punkva Caves", "cz": "Moravský kras a Punkevní jeskyně", "sk": "Moravský kras a Punkevné jaskyne" },
+    "description": {
+      "en": "Boat rides through the illuminated Punkva Caves end beneath the sheer walls of the Macocha Abyss, Central Europe's deepest sinkhole.",
+      "cz": "Plavba loďkou osvětlenými Punkevními jeskyněmi končí pod strmými stěnami propasti Macocha, nejhlubší propasti střední Evropy.",
+      "sk": "Plavba loďkou osvetlenými Punkevnými jaskyňami končí pod strmými stenami priepasti Macocha, najhlbšej priepasti strednej Európy."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "Guided tour with a boat ride; lots of stairs and cool cave temperatures, not stroller-friendly." }
+    },
+    "tags": ["guided-tour", "outdoor", "not-stroller-friendly"],
+    "externalUrl": "https://punkevni.caves.cz"
+  },
+  {
+    "id": "cz-pravcicka-brana",
+    "category": "nature",
+    "country": "CZ",
+    "region": "Ústí nad Labem Region",
+    "coordinates": { "lat": 50.8840, "lng": 14.2814 },
+    "name": { "en": "Pravčická brána, Bohemian Switzerland", "cz": "Pravčická brána, České Švýcarsko", "sk": "Pravčická brána, České Švajčiarsko" },
+    "description": {
+      "en": "The largest natural sandstone arch in Europe, reached by a forest trail through Bohemian Switzerland National Park.",
+      "cz": "Největší přírodní pískovcová brána v Evropě, k níž vede lesní stezka Národním parkem České Švýcarsko.",
+      "sk": "Najväčšia prírodná pieskovcová brána v Európe, ku ktorej vedie lesný chodník Národným parkom České Švajčiarsko."
+    },
+    "kidFriendly": {
+      "minAge": 6,
+      "notes": { "en": "About 1-1.5 hours' hike each way on forest paths; not suitable for strollers." }
+    },
+    "tags": ["outdoor", "hiking", "forest", "not-stroller-friendly"],
+    "externalUrl": "https://pbrana.cz"
+  },
+  {
+    "id": "cz-krkonose",
+    "category": "nature",
+    "country": "CZ",
+    "region": "Hradec Králové Region",
+    "coordinates": { "lat": 50.7361, "lng": 15.7403 },
+    "name": { "en": "Krkonoše National Park", "cz": "Krkonošský národní park", "sk": "Krkonošský národný park" },
+    "description": {
+      "en": "The Czech Republic's highest mountain range, with gentle valley trails near Vrchlabí and tougher hikes up to Sněžka peak.",
+      "cz": "Nejvyšší pohoří Česka s pozvolnými stezkami v údolí u Vrchlabí i náročnějšími výstupy na vrchol Sněžky.",
+      "sk": "Najvyššie pohorie Česka s pozvoľnými chodníkmi v údolí pri Vrchlabí aj náročnejšími výstupmi na vrchol Sněžky."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "Pick easy valley trails for young kids; the Sněžka summit hike suits older, fitter children." }
+    },
+    "tags": ["outdoor", "hiking", "forest"],
+    "externalUrl": "https://www.krnap.cz"
+  },
+  {
+    "id": "cz-telc",
+    "category": "historical-building",
+    "country": "CZ",
+    "region": "Vysočina Region",
+    "coordinates": { "lat": 49.1842, "lng": 15.4528 },
+    "name": { "en": "Telč Historic Centre", "cz": "Historické centrum Telče", "sk": "Historické centrum Telča" },
+    "description": {
+      "en": "A UNESCO-listed square of pastel Renaissance houses under arcades, framed by two ponds and a moated chateau.",
+      "cz": "Náměstí zapsané na seznamu UNESCO, lemované pastelovými renesančními domy s podloubím, dvěma rybníky a zámkem s vodním příkopem.",
+      "sk": "Námestie zapísané na zozname UNESCO, lemované pastelovými renesančnými domami s podlubím, dvoma rybníkmi a zámkom s vodnou priekopou."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Flat, stroller-friendly square; easy short walk, good for all ages." }
+    },
+    "tags": ["outdoor", "stroller-friendly"],
+    "externalUrl": "https://www.telc.eu"
+  },
+  {
+    "id": "cz-kutna-hora",
+    "category": "historical-building",
+    "country": "CZ",
+    "region": "Central Bohemia",
+    "coordinates": { "lat": 49.9483, "lng": 15.2683 },
+    "name": { "en": "Kutná Hora & Sedlec Ossuary", "cz": "Kutná Hora a Sedlecká kostnice", "sk": "Kutná Hora a Sedlecká kostnica" },
+    "description": {
+      "en": "A medieval silver-mining town with the soaring Gothic St Barbara's Cathedral and the famously unusual bone-decorated Sedlec Ossuary nearby.",
+      "cz": "Středověké město těžařů stříbra s vysokou gotickou katedrálou svaté Barbory a nedalekou neobvyklou Kostnicí v Sedlci zdobenou lidskými kostmi.",
+      "sk": "Stredoveké mesto ťažiarov striebra s vysokou gotickou katedrálou svätej Barbory a neďalekou nezvyčajnou Kostnicou v Sedlci zdobenou ľudskými kosťami."
+    },
+    "kidFriendly": {
+      "minAge": 7,
+      "notes": { "en": "The Sedlec Ossuary's bone decorations can be intense for younger or sensitive kids; book tickets ahead." }
+    },
+    "tags": ["indoor", "guided-tour"],
+    "externalUrl": "https://destinace.kutnahora.cz"
+  },
+  {
+    "id": "cz-mirakulum",
+    "category": "family-park",
+    "country": "CZ",
+    "region": "Central Bohemia",
+    "coordinates": { "lat": 50.2381, "lng": 14.8600 },
+    "name": { "en": "Mirakulum Family Park", "cz": "Park Mirakulum", "sk": "Park Mirakulum" },
+    "description": {
+      "en": "A forest adventure park near Prague with rope bridges, slides, a mini zoo, and over a kilometer of tunnels to explore.",
+      "cz": "Lesní zábavní park nedaleko Prahy s lanovými mosty, skluzavkami, minizoo a více než kilometrem tunelů k prozkoumání.",
+      "sk": "Lesný zábavný park neďaleko Prahy s lanovými mostami, šmykľavkami, mini zoo a viac ako kilometrom tunelov na preskúmanie."
+    },
+    "kidFriendly": {
+      "minAge": 2,
+      "notes": { "en": "Purpose-built for families; flat main paths but climbing structures need supervision." }
+    },
+    "tags": ["outdoor", "playground-nearby"],
+    "externalUrl": "https://www.mirakulum.cz"
+  },
+  {
+    "id": "cz-zoo-zlin",
+    "category": "zoo",
+    "country": "CZ",
+    "region": "Zlín Region",
+    "coordinates": { "lat": 49.2722, "lng": 17.7150 },
+    "name": { "en": "Zlín-Lešná Zoo", "cz": "Zoo Zlín-Lešná", "sk": "Zoo Zlín-Lešná" },
+    "description": {
+      "en": "One of Czechia's most-visited zoos, set in parkland around Lešná Chateau with a large botanical garden alongside the animal enclosures.",
+      "cz": "Jedna z nejnavštěvovanějších zoo v Česku, rozložená v parku kolem zámku Lešná s rozsáhlou botanickou zahradou vedle výběhů zvířat.",
+      "sk": "Jedna z najnavštevovanejších zoo v Česku, rozložená v parku okolo zámku Lešná s rozsiahlou botanickou záhradou vedľa výbehov zvierat."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Large grounds with gentle slopes; stroller-friendly paths, playgrounds, and a chateau to explore on the same visit." }
+    },
+    "tags": ["outdoor", "stroller-friendly", "playground-nearby"],
+    "externalUrl": "https://www.zoozlin.eu"
+  }
+]

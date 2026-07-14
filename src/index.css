@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-paper: #f6f8f4;
+  --color-brand-paper-raised: #ffffff;
+  --color-brand-ink: #0e1f17;
+  --color-brand-ink-soft: #3c544a;
+  --color-brand-forest: #1f6d4c;
+  --color-brand-forest-deep: #144a34;
+  --color-brand-mint: #7fd4a6;
+  --color-brand-mint-line: #c9e7d5;
+  --color-brand-header: #144a34;
+  --color-brand-header-text: #f6fbf8;
+
+  --font-display: "Baloo 2", "Nunito", sans-serif;
+  --font-sans: "Nunito", "IBM Plex Sans", sans-serif;
+}
+
+/* OS/browser dark-mode preference — overriding the tokens here flips every
+   utility built from them (bg-brand-paper, text-brand-ink, ...) with no
+   per-component dark: classes needed. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-brand-paper: #0e1b15;
+    --color-brand-paper-raised: #16261e;
+    --color-brand-ink: #eaf7ef;
+    --color-brand-ink-soft: #9ec7af;
+    --color-brand-forest: #4bbf87;
+    --color-brand-forest-deep: #2f8f63;
+    --color-brand-mint: #7fd4a6;
+    --color-brand-mint-line: #234737;
+    --color-brand-header: #0b2e20;
+    --color-brand-header-text: #eaf7ef;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-brand-ink);
+  background-color: var(--color-brand-paper);
+}

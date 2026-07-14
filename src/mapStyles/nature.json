@@ -1,0 +1,75 @@
+[
+  { "elementType": "geometry", "stylers": [{ "color": "#f6f8f4" }] },
+  { "elementType": "labels.text.fill", "stylers": [{ "color": "#0e1f17" }] },
+  { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f6f8f4" }] },
+  { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#6bb3c9" }]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry",
+    "stylers": [{ "color": "#d9f0e1" }]
+  },
+  {
+    "featureType": "landscape.natural.terrain",
+    "elementType": "geometry",
+    "stylers": [{ "hue": "#8fcf9f" }, { "saturation": 45 }, { "lightness": 2 }]
+  },
+  {
+    "featureType": "landscape.natural.landcover",
+    "elementType": "geometry",
+    "stylers": [{ "hue": "#9fdcb0" }, { "saturation": 30 }, { "lightness": 10 }]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [{ "hue": "#4fae72" }, { "saturation": 45 }, { "lightness": -8 }]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.stroke",
+    "stylers": [{ "color": "#1f6d4c" }]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.fill",
+    "stylers": [{ "color": "#ffffff" }]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.stroke",
+    "stylers": [{ "color": "#c9e7d5" }]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.fill",
+    "stylers": [{ "color": "#1f6d4c" }]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [{ "color": "#144a34" }]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [{ "color": "#f6f8f4" }]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry.stroke",
+    "stylers": [{ "color": "#3c544a" }]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels",
+    "stylers": [{ "visibility": "off" }]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [{ "visibility": "off" }]
+  }
+]
