@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppStore, type MapTypeId } from "../store/useAppStore";
+import { useAppStore, type Language, type MapStyleId, type MapTypeId } from "../store/useAppStore";
+import { useIsMobile } from "../hooks/useIsMobile";
+import { useLanguageChange } from "../hooks/useLanguageChange";
 
 const MAP_TYPES: MapTypeId[] = ["terrain", "roadmap", "satellite"];
+const MAP_STYLES: MapStyleId[] = ["playful", "nature"];
+const LANGUAGES: Language[] = ["en", "cz", "sk"];
 
 export function MapLayerSettings() {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const mapStyle = useAppStore((s) => s.mapStyle);
+  const setMapStyle = useAppStore((s) => s.setMapStyle);
+  const language = useAppStore((s) => s.language);
+  const handleLanguageChange = useLanguageChange();
   const mapTypeId = useAppStore((s) => s.mapTypeId);
   const setMapTypeId = useAppStore((s) => s.setMapTypeId);
   const showRoads = useAppStore((s) => s.showRoads);
@@ -40,6 +49,48 @@ export function MapLayerSettings() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-2xl bg-brand-paper-raised p-2 text-brand-ink shadow-xl ring-1 ring-brand-mint-line">
+            {/* Style + language live here only on mobile, where the header's
+                inline pills aren't rendered at all (see useIsMobile). */}
+            {isMobile && (
+              <div>
+                <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.style")}</p>
+                <div className="flex gap-1 px-2 pb-2">
+                  {MAP_STYLES.map((style) => (
+                    <button
+                      key={style}
+                      type="button"
+                      onClick={() => setMapStyle(style)}
+                      className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors ${
+                        mapStyle === style
+                          ? "bg-brand-forest text-white"
+                          : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
+                      }`}
+                    >
+                      {t(`mapStyle.${style}`)}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.language")}</p>
+                <div className="flex gap-1 px-2 pb-2">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => handleLanguageChange(lang)}
+                      className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold uppercase transition-colors ${
+                        language === lang
+                          ? "bg-brand-forest text-white"
+                          : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
+                      }`}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.mapView")}</p>
             <div className="flex gap-1 px-2 pb-2">
               {MAP_TYPES.map((type) => (

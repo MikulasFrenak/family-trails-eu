@@ -11,14 +11,18 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
 ```
 /src
   /components     # MapView, CategoryFilter, LanguageSwitcher, POIDetailPanel, MarkerLayer,
-                   # StyleSwitcher, ZoomControl, MapLayerSettings, MapLoadFallback
+                   # StyleSwitcher, ZoomControl, MapLayerSettings, MapLoadFallback, FilterControl
   /mapStyles      # playful.json, nature.json — hand-authored Google Maps style arrays
   /assets/markers # custom SVG category pin icons (reused in filter chips + POI badge)
   /i18n           # react-i18next config + en/cz/sk dictionaries
   /store          # Zustand store (useAppStore.ts)
+  /hooks          # useIsMobile.ts (matchMedia guard), useLanguageChange.ts (shared change-language
+                   # + reload logic — used by LanguageSwitcher and MapLayerSettings, don't re-duplicate it)
   /lib            # categoryIcons.ts, clusterPieIcon.ts, mapConstants.ts — small shared helpers
   /data           # pois.ts — loads + flattens /data/poi/*.json for the app
   /types          # poi.ts — shared Poi/Category types
+  test-setup.ts   # Vitest setup — polyfills window.matchMedia (jsdom doesn't implement it at all)
+  *.test.ts       # colocated with the file under test, not in a separate /tests tree
 /data
   /poi            # cz.json (16), sk.json (31) — curated, web-research-sourced POI data
   categories.json  # taxonomy + color + emoji + icon mapping
@@ -38,6 +42,7 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
 - `react-i18next` + `i18next-browser-languagedetector`
 - Zustand for global state (country, language, map style, map type, category filters, layer-visibility toggles)
 - Cloudflare Pages for hosting
+- Vitest (jsdom) for unit tests — pure logic/hooks only, see `PLAN.md` §2 Testing
 
 **Styling approach: Tailwind.** Chosen over CSS Modules and styled-components — both Tailwind and CSS Modules compile to static CSS with no runtime cost, but Tailwind wins on DX for a marker-heavy map UI (consistent spacing/sizing utilities across `MapView`/`CategoryFilter`/`POIDetailPanel` without hand-writing many small `.module.css` files). styled-components/inline styles were ruled out: `MarkerLayer` re-renders on filter/category changes, and runtime CSS-in-JS or inline style objects add per-render overhead that scales with marker count. Don't let a second approach creep in once picked.
 
@@ -103,7 +108,7 @@ Run `/public-repo-check` before every push.
 
 ## Setup
 
-1. Google Cloud project with Maps JavaScript API + Places API enabled, key restricted by HTTP referrer to the Cloudflare Pages domain(s) — done locally via a hard daily quota cap rather than a spend budget (budgets only alert, quotas actually prevent charges).
-2. Cloudflare Pages project connected to this repo; `VITE_GOOGLE_MAPS_API_KEY` set as a build env var — **not yet done** (Phase 6, no deploy yet).
+1. Google Cloud project with Maps JavaScript API + Places API enabled, key restricted by HTTP referrer to the deployed domain(s) — done via a hard daily quota cap rather than a spend budget (budgets only alert, quotas actually prevent charges).
+2. Deployed on Cloudflare (Workers-with-static-assets, git-connected — auto-deploys on push to `main`); `VITE_GOOGLE_MAPS_API_KEY` is a **build-time** env var there, not a runtime secret — Vite bakes `import.meta.env.VITE_*` into the bundle at build, so it must be set in the project's build-environment-variables settings (not "Variables and Secrets", which is Worker-runtime-only and won't affect the build).
 3. `npm install`, then put the real key in `.env.local` (gitignored, never commit it) as `VITE_GOOGLE_MAPS_API_KEY=...`, then `npm run dev`.
-4. `npm run validate-poi` checks `/data/poi/*.json` against `data/schema.md`; `npm run build` runs a full typecheck + production build.
+4. `npm run validate-poi` checks `/data/poi/*.json` against `data/schema.md`; `npm run build` runs a full typecheck + production build; `npm run test` runs the Vitest suite once, `npm run test:watch` for watch mode.

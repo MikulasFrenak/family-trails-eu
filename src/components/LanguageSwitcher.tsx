@@ -1,21 +1,11 @@
-import { useTranslation } from "react-i18next";
 import { useAppStore, type Language } from "../store/useAppStore";
+import { useLanguageChange } from "../hooks/useLanguageChange";
 
 const LANGUAGES: Language[] = ["en", "cz", "sk"];
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
   const language = useAppStore((s) => s.language);
-  const setLanguage = useAppStore((s) => s.setLanguage);
-
-  const handleChange = (lang: Language) => {
-    if (lang === language) return;
-    setLanguage(lang);
-    // Google Maps only reads its `language` param when the script first
-    // loads and can't hot-swap it afterwards, so a full reload is the only
-    // way to actually re-localize the map tiles/labels.
-    void i18n.changeLanguage(lang).then(() => window.location.reload());
-  };
+  const handleChange = useLanguageChange();
 
   return (
     <div className="flex gap-1 rounded-full bg-white/10 p-1">

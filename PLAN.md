@@ -70,7 +70,14 @@ Committed to the repo, validated by a small script (`scripts/validate-poi.ts`) r
 - Marker clustering via `@googlemaps/markerclusterer` with a custom pie-chart renderer — a cluster badge is a pie chart of the categories grouped inside it (colored per category) plus the total count, so you can tell what's in a cluster before zooming in. Click-to-zoom is the library's default behavior.
 - Map type (Terrain / Flat / Satellite) and 4 label-visibility toggles (roads, town names, mountain names, rivers & lakes names — all default **off** for a clean marker-focused map) live in a custom settings panel (`MapLayerSettings`), since Google's default UI can't be restyled to match the brand.
 - Zoom is bounded (6–18) so the map can't zoom out to a useless whole-world view or in past street-level detail; the custom zoom control's +/− buttons disable at those bounds.
+- Default view and the zoom control's "recenter" button both use `fitBounds`/`defaultBounds` against a hardcoded `SLOVAKIA_BOUNDS` constant (`src/lib/mapConstants.ts`) — **deliberately Slovakia-only**, confirmed with the user despite it hiding ~all Czech POIs on load (15 of 16 fall outside the box). Don't "fix" this to a CZ+SK combined box without checking — it was flagged by code review and explicitly kept as-is.
 - Dark mode follows OS/browser `prefers-color-scheme` automatically (no manual toggle) via CSS custom-property overrides — one deliberate scope cut: the Google Map tiles themselves stay in their light style even when the UI shell goes dark (building an actual dark Google Maps style is separate, bigger scope).
+
+### Mobile / responsive
+- `useIsMobile()` (`src/hooks/useIsMobile.ts`) is a JS-level guard via `matchMedia`, not CSS-only responsive hiding — components actually don't mount on the other breakpoint, rather than mounting-and-hiding via Tailwind `hidden sm:*`. Breakpoint is 639px, matching Tailwind's `sm:` (640px) exactly so JS and CSS never disagree. Phone gets the compact UI below; tablet and up render identically to desktop.
+- On phone: the header collapses to just the title + one settings icon (`StyleSwitcher`/`LanguageSwitcher` don't render at all); the `CategoryFilter` chip row doesn't render either, replaced by a floating `FilterControl` button (bottom-right, funnel icon, green dot badge when any category filter is active). `MapLayerSettings`' dropdown gains mobile-only "Map style" and "Language" picker sections so those controls are still reachable from one place.
+- `FilterControl` shifts upward (`bottom-[calc(65vh+0.75rem)]` instead of `bottom-3`) whenever `POIDetailPanel` is open, since that panel spans full width at the same bottom-right corner on phone (no `sm:right-auto` below 640px) — without this the two overlap.
+- `LanguageSwitcher` and `MapLayerSettings`' mobile language picker both need the exact same "change language, then reload" behavior (see i18n note above) — shared via `useLanguageChange()` (`src/hooks/useLanguageChange.ts`) rather than duplicated, after code review found the duplication had already drifted once.
 
 ### Search & standard Maps features
 - Google Places Autocomplete search box — **not yet built** (Phase 5, deferred; untested integration code without a working search flow felt worse than no code).
@@ -83,7 +90,13 @@ Committed to the repo, validated by a small script (`scripts/validate-poi.ts`) r
 - Display font is "Baloo 2" (not the originally-picked "Fredoka") — Fredoka was silently missing glyphs for Czech/Slovak characters like `č`/`ď`, causing mid-word font-fallback glitches in exactly this app's two target languages. Worth remembering when picking display fonts for future CZ/SK-facing work.
 
 ### Component sketch
-`MapView`, `StyleSwitcher`, `CategoryFilter` (with a dynamic overflow "⋯" menu — measures actual rendered chip widths per language/viewport rather than fixed breakpoints, so it never silently overflows), `LanguageSwitcher`, `POIDetailPanel`, `MarkerLayer`, `MapLoadFallback`, `ZoomControl`, `MapLayerSettings`. `SearchBox` is sketched but not built (Phase 5).
+`MapView`, `StyleSwitcher`, `CategoryFilter` (with a dynamic overflow "⋯" menu — measures actual rendered chip widths per language/viewport rather than fixed breakpoints, so it never silently overflows), `LanguageSwitcher`, `POIDetailPanel`, `MarkerLayer`, `MapLoadFallback`, `ZoomControl`, `MapLayerSettings`, `FilterControl` (mobile-only floating equivalent of `CategoryFilter`). `SearchBox` is sketched but not built (Phase 5).
+
+### Testing
+- **Vitest** (jsdom environment) — chosen since it shares config with Vite (`vite.config.ts`'s `test` field) rather than needing a separate Jest setup. `npm run test` (single run) / `npm run test:watch`.
+- What's covered: pure logic and hooks only — `clusterPieIcon.test.ts` (pie-slice math, degenerate-input handling), `useAppStore.test.ts` (store actions), `useIsMobile.test.ts` (breakpoint boundary, listener cleanup on unmount). No component/integration tests yet.
+- `src/test-setup.ts` polyfills `window.matchMedia`, which jsdom doesn't implement at all (throws, not just "always false") — needed for `useIsMobile` and anything that renders it to run under test.
+- Everything else (visual/UX correctness, the actual map rendering, responsive layout at real viewport sizes) is verified manually via Playwright screenshots each round, not as a checked-in test suite — matches this project's scale; revisit if the app grows enough to need regression coverage beyond pure logic.
 
 ### Quota-exceeded fallback
 This is a personal project on a hard-capped free-tier Google Cloud quota (see Phase 0 infra) — the map **will** occasionally be unavailable, and that needs to look intentional, not broken.

@@ -23,6 +23,8 @@
   },
   "mapLayers": {
     "title": "Map layers",
+    "style": "Map style",
+    "language": "Language",
     "mapView": "Map view",
     "terrain": "Terrain",
     "roadmap": "Flat",
