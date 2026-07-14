@@ -23,6 +23,8 @@
   },
   "mapLayers": {
     "title": "Vrstvy mapy",
+    "style": "Styl mapy",
+    "language": "Jazyk",
     "mapView": "Zobrazení mapy",
     "terrain": "Terén",
     "roadmap": "Plochá",

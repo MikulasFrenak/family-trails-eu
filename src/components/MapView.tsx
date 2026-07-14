@@ -4,7 +4,8 @@ import { useAppStore, type Language, type MapStyleId } from "../store/useAppStor
 import { MarkerLayer } from "./MarkerLayer";
 import { MapLoadFallback } from "./MapLoadFallback";
 import { ZoomControl } from "./ZoomControl";
-import { MIN_ZOOM, MAX_ZOOM } from "../lib/mapConstants";
+import { FilterControl } from "./FilterControl";
+import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 import playfulStyle from "../mapStyles/playful.json";
 import natureStyle from "../mapStyles/nature.json";
 
@@ -44,9 +45,6 @@ const HIDE_WATER_LABELS_STYLE: google.maps.MapTypeStyle = {
   stylers: [{ visibility: "off" }],
 };
 
-// Leans toward Slovakia while still keeping most of Czechia in view at the default zoom.
-const DEFAULT_CENTER = { lat: 48.9, lng: 18.8 };
-const DEFAULT_ZOOM = 7;
 const LOAD_TIMEOUT_MS = 6000;
 
 declare global {
@@ -93,8 +91,7 @@ export function MapView() {
     // LanguageSwitcher does a full page reload to actually change it).
     <APIProvider apiKey={apiKey} language={GOOGLE_MAPS_LANGUAGE[language]}>
       <Map
-        defaultCenter={DEFAULT_CENTER}
-        defaultZoom={DEFAULT_ZOOM}
+        defaultBounds={{ ...SLOVAKIA_BOUNDS, padding: MAP_BOUNDS_PADDING }}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
         mapTypeId={mapTypeId}
@@ -106,6 +103,7 @@ export function MapView() {
         <TileLoadWatcher onFail={() => setFailed(true)} />
         <MarkerLayer />
         <ZoomControl />
+        <FilterControl />
       </Map>
     </APIProvider>
   );
