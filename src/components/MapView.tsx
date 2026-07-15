@@ -1,5 +1,5 @@
 import { APIProvider, Map, useMap } from "@vis.gl/react-google-maps";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppStore, type Language, type MapStyleId } from "../store/useAppStore";
 import { MarkerLayer } from "./MarkerLayer";
 import { MapLoadFallback } from "./MapLoadFallback";
@@ -45,7 +45,9 @@ const HIDE_WATER_LABELS_STYLE: google.maps.MapTypeStyle = {
   stylers: [{ visibility: "off" }],
 };
 
-const LOAD_TIMEOUT_MS = 6000;
+// Generous on purpose: slow connections and cold caches legitimately take a
+// while, and a false "failed" is worse than a slow map — see TileLoadWatcher.
+const LOAD_TIMEOUT_MS = 15000;
 
 declare global {
   interface Window {
@@ -62,7 +64,17 @@ export function MapView() {
   const showPlaceLabels = useAppStore((s) => s.showPlaceLabels);
   const showMountainLabels = useAppStore((s) => s.showMountainLabels);
   const showWaterLabels = useAppStore((s) => s.showWaterLabels);
-  const [failed, setFailed] = useState(false);
+  // 'auth' = key/quota problem (retry won't help, message says come back
+  // tomorrow); 'timeout' = tiles just didn't arrive in time (transient —
+  // slow network, cold cache, lazy iframe), so the fallback offers a retry.
+  const [failure, setFailure] = useState<null | "auth" | "timeout">(null);
+  const [attempt, setAttempt] = useState(0);
+
+  const handleTimeout = useCallback(() => setFailure("timeout"), []);
+  const handleRetry = useCallback(() => {
+    setFailure(null);
+    setAttempt((a) => a + 1);
+  }, []);
 
   const styles = useMemo(
     () => [
@@ -76,20 +88,25 @@ export function MapView() {
   );
 
   useEffect(() => {
-    window.gm_authFailure = () => setFailed(true);
+    window.gm_authFailure = () => setFailure("auth");
     return () => {
       delete window.gm_authFailure;
     };
   }, []);
 
-  if (!apiKey || apiKey === "REPLACE_WITH_YOUR_KEY" || failed) {
+  if (!apiKey || apiKey === "REPLACE_WITH_YOUR_KEY" || failure === "auth") {
     return <MapLoadFallback />;
+  }
+
+  if (failure === "timeout") {
+    return <MapLoadFallback onRetry={handleRetry} />;
   }
 
   return (
     // Google Maps only reads `language` when its script first loads (the
     // LanguageSwitcher does a full page reload to actually change it).
-    <APIProvider apiKey={apiKey} language={GOOGLE_MAPS_LANGUAGE[language]}>
+    // `key={attempt}` remounts the whole provider on retry.
+    <APIProvider key={attempt} apiKey={apiKey} language={GOOGLE_MAPS_LANGUAGE[language]}>
       <Map
         defaultBounds={{ ...SLOVAKIA_BOUNDS, padding: MAP_BOUNDS_PADDING }}
         minZoom={MIN_ZOOM}
@@ -100,7 +117,7 @@ export function MapView() {
         gestureHandling="greedy"
         className="h-full w-full"
       >
-        <TileLoadWatcher onFail={() => setFailed(true)} />
+        <TileLoadWatcher onFail={handleTimeout} />
         <MarkerLayer />
         <ZoomControl />
         <FilterControl />
@@ -119,13 +136,31 @@ function TileLoadWatcher({ onFail }: { onFail: () => void }) {
     return () => listener.remove();
   }, [map]);
 
+  // Watchdog only counts time while the page is actually visible — in a
+  // background tab (or before a lazy iframe scrolls into view) the browser
+  // legitimately postpones tile loading, and that must not count as failure.
   useEffect(() => {
-    if (loaded) return;
-    const timeout = setTimeout(() => {
-      if (!loaded) onFail();
-    }, LOAD_TIMEOUT_MS);
-    return () => clearTimeout(timeout);
-  }, [loaded, onFail]);
+    if (loaded || !map) return;
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const disarm = () => {
+      if (timeout !== undefined) clearTimeout(timeout);
+      timeout = undefined;
+    };
+    const arm = () => {
+      disarm();
+      if (document.visibilityState === "visible") {
+        timeout = setTimeout(onFail, LOAD_TIMEOUT_MS);
+      }
+    };
+
+    arm();
+    document.addEventListener("visibilitychange", arm);
+    return () => {
+      disarm();
+      document.removeEventListener("visibilitychange", arm);
+    };
+  }, [loaded, map, onFail]);
 
   return null;
 }

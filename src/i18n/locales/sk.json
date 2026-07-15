@@ -16,7 +16,9 @@
   },
   "mapLoadFallback": {
     "title": "Mapa je momentálne nedostupná",
-    "message": "Ide o malý osobný projekt na bezplatnom tarife — dnešný limit pre mapu je vyčerpaný. Skúste to zajtra!"
+    "message": "Ide o malý osobný projekt na bezplatnom tarife — dnešný limit pre mapu je vyčerpaný. Skúste to zajtra!",
+    "timeoutMessage": "Mapa sa načítava dlhšie než zvyčajne — asi pomalé pripojenie. Skúste to znova.",
+    "retry": "Skúsiť znova"
   },
   "searchBox": {
     "placeholder": "Hľadať miesto…"

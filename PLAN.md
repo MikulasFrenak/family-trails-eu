@@ -100,9 +100,9 @@ Committed to the repo, validated by a small script (`scripts/validate-poi.ts`) r
 
 ### Quota-exceeded fallback
 This is a personal project on a hard-capped free-tier Google Cloud quota (see Phase 0 infra) — the map **will** occasionally be unavailable, and that needs to look intentional, not broken.
-- Detection: register `window.gm_authFailure` before the Maps script loads (fires on billing/quota/auth rejection at load time) **and** a load timeout — if the map hasn't fired `tilesloaded` within ~5s, treat it as failed. Either condition swaps `MapView` for `MapLoadFallback`.
-- Fallback content: text-only — a friendly centered message (e.g. "🗺️ This is a small personal project on a free tier — today's map quota is used up. Come back tomorrow!"), no screenshot asset to maintain.
-- No retry loops, no error telemetry/reporting service — static and simple, matching the scale of the project.
+- Detection: register `window.gm_authFailure` before the Maps script loads (fires on billing/quota/auth rejection at load time) **and** a tile-load watchdog — if the map hasn't fired `tilesloaded` within 15s of *visible* time, treat it as a timeout. The watchdog only counts while `document.visibilityState === "visible"` (re-arms on `visibilitychange`), because background tabs and lazy iframe embeds legitimately postpone tile loading — the original 6s since-mount version fired falsely in exactly those cases ("map randomly doesn't load, refresh fixes it").
+- Failure kinds are split: `auth` (quota/key — dead-end message, retry wouldn't help) vs `timeout` (transient — different message + a "Try again" button that remounts the `APIProvider` via a React key).
+- Fallback content: text-only — a friendly centered message, no screenshot asset to maintain. No error telemetry/reporting service — simple, matching the scale of the project.
 
 ---
 
