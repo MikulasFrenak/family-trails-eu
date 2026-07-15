@@ -16,7 +16,9 @@
   },
   "mapLoadFallback": {
     "title": "Map unavailable right now",
-    "message": "This is a small personal project running on a free tier — today's map quota is used up. Come back tomorrow!"
+    "message": "This is a small personal project running on a free tier — today's map quota is used up. Come back tomorrow!",
+    "timeoutMessage": "The map is taking longer than usual — probably a slow connection. Give it another try.",
+    "retry": "Try again"
   },
   "searchBox": {
     "placeholder": "Search a place…"
