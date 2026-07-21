@@ -1,55 +1,60 @@
 import maplibregl from "maplibre-gl";
+import Supercluster from "supercluster";
 import { useEffect, useMemo, useRef } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { ALL_POIS } from "../data/pois";
 import categoriesData from "../../data/categories.json";
-import type { Category, Poi } from "../types/poi";
+import type { Category } from "../types/poi";
 import { buildClusterPieIcon, type PieSegment } from "../lib/clusterPieIcon";
 import { CATEGORY_ICONS } from "../lib/categoryIcons";
 import { MARKER_CLUSTER_MAX_ZOOM, MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
 
-// NOTE: this file follows MapLibre's own "Display HTML clusters with custom
-// properties" pattern (clustered GeoJSON source + querySourceFeatures() +
-// manually-synced maplibregl.Marker pool), adapted to render individual POIs
-// as HTML markers too (not just clusters), reusing buildClusterPieIcon from
-// the Google implementation. Clustering/pan/zoom/marker-visibility have been
-// verified live in a real browser against the local dev server; `npm run
-// build`/`tsc` itself still hasn't been run from the sandbox this was
-// written in (npm registry blocked there) — worth a final typecheck pass.
-
+// This used to drive clustering through MapLibre's own GeoJSON `cluster:
+// true` source (tiled, queried via querySourceFeatures()). Switched to a
+// directly-managed `supercluster` instance instead — same library
+// @googlemaps/markerclusterer uses under the hood for MarkerLayer.tsx's
+// Google view — after a reported mismatch ("Google shows a 5-cluster near
+// Bratislava, TomTom shows 6 for what looks like the same view"). Root
+// cause: MapLibre's native clustering is tile-based, so it always resolves
+// the current (possibly fractional) zoom via Math.floor before picking
+// which pre-clustered zoom tier to show (confirmed in maplibre-gl's own
+// bundled source); @googlemaps/markerclusterer's SuperClusterAlgorithm
+// instead does `zoom = Math.round(map.getZoom())` (confirmed in its
+// source). Floor vs. round at a fractional zoom like 7.6 lands on two
+// different integer tiers (7 vs. 8) of the *same* underlying supercluster
+// index, which is exactly the kind of one-cluster-membership difference
+// reported. Running our own supercluster instance here — with the same
+// Math.round — reproduces Google's clustering algorithm exactly, radius,
+// maxZoom and all, instead of two different clustering engines that happen
+// to be configured similarly.
 const CATEGORIES = categoriesData as unknown as Category[];
 const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
   CATEGORIES.map((category) => [category.id, category.color]),
 );
 const CATEGORY_ORDER: string[] = CATEGORIES.map((category) => category.id);
-const SOURCE_ID = "family-trails-pois";
-const LOAD_TRIGGER_LAYER_ID = `${SOURCE_ID}-load-trigger`;
 
-// Local, minimal GeoJSON shape — deliberately not importing the ambient
-// `GeoJSON.*` namespace from @types/geojson: this repo's tsconfig `types`
-// array only allowlists vite/client, google.maps, and node, so that global
-// namespace isn't visible here. Structural typing still lets this satisfy
-// maplibre-gl's own (internally-referenced) GeoJSON types at the call site.
-interface PoiFeature {
-  type: "Feature";
-  properties: { id: string; category: string };
-  geometry: { type: "Point"; coordinates: [number, number] };
+// Deliberately no index signature here (a broad `[key: string]: unknown`
+// would make the `"cluster" in props` discriminant below ambiguous for
+// TypeScript, since a PointProps with an index signature could technically
+// also claim to have a "cluster" key). Kept minimal and exact instead.
+interface PointProps {
+  id: string;
+  category: string;
 }
 
-interface PoiFeatureCollection {
-  type: "FeatureCollection";
-  features: PoiFeature[];
-}
+// Per-category running counts, aggregated by supercluster's map/reduce
+// options — the direct-JS equivalent of the `clusterProperties` expressions
+// the old GeoJSON-source version used, and of categoryByMarker in
+// MarkerLayer.tsx (Google): however each side gets there, every cluster ends
+// up knowing how many of each category it contains, for the pie icon. Plain
+// Record<string, number> (not a template-literal-keyed type) so it stays
+// unambiguously assignable to supercluster's generic C constraint.
+type ClusterProps = Record<string, number>;
 
-function toFeatureCollection(pois: Poi[]): PoiFeatureCollection {
-  return {
-    type: "FeatureCollection",
-    features: pois.map((poi) => ({
-      type: "Feature",
-      properties: { id: poi.id, category: poi.category },
-      geometry: { type: "Point", coordinates: [poi.coordinates.lng, poi.coordinates.lat] },
-    })),
-  };
+function buildCategoryCounts(category: string): ClusterProps {
+  const counts = {} as ClusterProps;
+  for (const id of CATEGORY_ORDER) counts[`cat_${id}`] = category === id ? 1 : 0;
+  return counts;
 }
 
 function buildClusterMarkerElement(segments: PieSegment[], size: number, count: number): HTMLDivElement {
@@ -106,33 +111,15 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
   const selectPoiRef = useRef(selectPoi);
   selectPoiRef.current = selectPoi;
 
+  // Rebuilt whenever the filtered POI set changes (see the second effect
+  // below); read from the map-event-driven render loop via this ref so that
+  // loop doesn't need to be torn down and re-registered on every filter
+  // click — same reasoning the old querySourceFeatures version had for
+  // keeping this effect's deps to [map] only.
+  const indexRef = useRef<Supercluster<PointProps, ClusterProps> | null>(null);
+  const updateMarkersRef = useRef<() => void>(() => {});
+
   useEffect(() => {
-    const clusterProperties: Record<string, unknown> = {};
-    for (const id of CATEGORY_ORDER) {
-      clusterProperties[`cat_${id}`] = ["+", ["case", ["==", ["get", "category"], id], 1, 0]];
-    }
-
-    map.addSource(SOURCE_ID, {
-      type: "geojson",
-      data: toFeatureCollection(visiblePois) as never,
-      cluster: true,
-      clusterRadius: MARKER_CLUSTER_RADIUS,
-      // Without this, a GeoJSON source's clusterMaxZoom defaults to the
-      // source's own maxzoom (18 here), two zoom levels past where Google's
-      // clusterer already dissolves clusters — see MARKER_CLUSTER_MAX_ZOOM.
-      clusterMaxZoom: MARKER_CLUSTER_MAX_ZOOM,
-      clusterProperties: clusterProperties as never,
-    });
-    // MapLibre only tiles/clusters a GeoJSON source once a layer references
-    // it — this layer exists purely to trigger that. Zero size/opacity: all
-    // real rendering happens via the HTML markers below.
-    map.addLayer({
-      id: LOAD_TRIGGER_LAYER_ID,
-      type: "circle",
-      source: SOURCE_ID,
-      paint: { "circle-opacity": 0, "circle-radius": 0 },
-    });
-
     // Long-lived element cache (never cleared except on unmount) plus the
     // subset currently attached to the map — mirrors MapLibre's own
     // reference implementation for HTML cluster markers.
@@ -140,33 +127,49 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
     let markersOnScreen = new Map<string, maplibregl.Marker>();
 
     const updateMarkers = () => {
-      if (!map.isSourceLoaded(SOURCE_ID)) return;
-      const features = map.querySourceFeatures(SOURCE_ID);
+      const index = indexRef.current;
+      if (!index) return;
+
+      const bounds = map.getBounds();
+      const bbox: [number, number, number, number] = [
+        bounds.getWest(),
+        bounds.getSouth(),
+        bounds.getEast(),
+        bounds.getNorth(),
+      ];
+      // Math.round, not Math.floor — this is the one line that actually
+      // fixes the cross-provider mismatch (see the file-level comment).
+      // supercluster's own getClusters floors whatever zoom you pass it
+      // internally, so rounding first is what gets it to Google's tier
+      // instead of MapLibre's native tile-floor tier.
+      const zoom = Math.round(map.getZoom());
+      const features = index.getClusters(bbox, zoom);
       const newOnScreen = new Map<string, maplibregl.Marker>();
 
       for (const feature of features) {
-        if (feature.geometry.type !== "Point") continue;
-        const [lng, lat] = feature.geometry.coordinates as [number, number];
-        const props = (feature.properties ?? {}) as Record<string, unknown>;
+        const [lng, lat] = feature.geometry.coordinates;
+        const props = feature.properties;
 
-        if (props.cluster) {
-          const clusterId = props.cluster_id as number;
+        if ("cluster" in props && props.cluster) {
+          const clusterId = props.cluster_id;
           const key = `cluster-${clusterId}`;
           let marker = markerCache.get(key);
           if (!marker) {
-            const count = props.point_count as number;
-            const segments = CATEGORY_ORDER.filter((id) => Number(props[`cat_${id}`] ?? 0) > 0).map(
-              (id) => ({ color: CATEGORY_COLORS[id], count: Number(props[`cat_${id}`] ?? 0) }),
-            );
+            const count = props.point_count;
+            const segments = CATEGORY_ORDER.filter((id) => Number(props[`cat_${id}`] ?? 0) > 0).map((id) => ({
+              color: CATEGORY_COLORS[id],
+              count: Number(props[`cat_${id}`] ?? 0),
+            }));
             const size = Math.round(Math.min(56, 34 + count * 1.5));
             const el = buildClusterMarkerElement(segments, size, count);
             el.addEventListener("click", () => {
-              const source = map.getSource(SOURCE_ID);
-              if (!source || !("getClusterExpansionZoom" in source)) return;
-              (source as maplibregl.GeoJSONSource)
-                .getClusterExpansionZoom(clusterId)
-                .then((zoom) => map.easeTo({ center: [lng, lat], zoom }))
-                .catch(() => {});
+              try {
+                const expansionZoom = index.getClusterExpansionZoom(clusterId);
+                map.easeTo({ center: [lng, lat], zoom: expansionZoom });
+              } catch {
+                // Cluster id no longer valid (index was rebuilt since this
+                // marker was created, e.g. a filter change) — ignore.
+              }
             });
             marker = new maplibregl.Marker({ element: el }).setLngLat([lng, lat]);
             markerCache.set(key, marker);
@@ -174,11 +177,11 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
           newOnScreen.set(key, marker);
           if (!markersOnScreen.has(key)) marker.addTo(map);
         } else {
-          const id = props.id as string;
+          const id = (props as PointProps).id;
           const key = `poi-${id}`;
           let marker = markerCache.get(key);
           if (!marker) {
-            const el = buildPoiMarkerElement(props.category as string);
+            const el = buildPoiMarkerElement((props as PointProps).category);
             el.addEventListener("click", () => selectPoiRef.current(id));
             marker = new maplibregl.Marker({ element: el, anchor: "bottom" }).setLngLat([lng, lat]);
             markerCache.set(key, marker);
@@ -194,7 +197,13 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
       markersOnScreen = newOnScreen;
     };
 
-    map.on("render", updateMarkers);
+    updateMarkersRef.current = updateMarkers;
+    // "move" covers pan + zoom + programmatic easeTo/flyTo — the same set
+    // of camera changes the old "render" listener reacted to, but without
+    // firing on every single animation frame regardless of whether the
+    // camera actually moved.
+    map.on("move", updateMarkers);
+    updateMarkers();
 
     return () => {
       // Under rapid provider switching, the parent's underlying
@@ -202,12 +211,10 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
       // called) by the time this child cleanup runs — every map-touching
       // call here can throw in that case ("Cannot read properties of
       // undefined"), so guard the whole block rather than crash the
-      // switch. The marker-pool cleanup above/below doesn't touch `map`
-      // directly and stays outside the guard.
+      // switch. The marker-pool cleanup below doesn't touch `map` directly
+      // and stays outside the guard.
       try {
-        map.off("render", updateMarkers);
-        if (map.getLayer(LOAD_TRIGGER_LAYER_ID)) map.removeLayer(LOAD_TRIGGER_LAYER_ID);
-        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+        map.off("move", updateMarkers);
       } catch {
         // Map already removed by the parent — nothing left to clean up.
       }
@@ -216,23 +223,39 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
       markersOnScreen.clear();
     };
     // Only re-run this whole setup if the map instance itself changes — POI
-    // filtering is handled by the effect below via setData, not by tearing
-    // this down (that would flash/rebuild every marker on every filter click).
-    // visiblePois/selectPoi are intentionally excluded from these deps.
+    // filtering is handled by the effect below (rebuilding indexRef and
+    // calling updateMarkersRef.current()), not by tearing this down (that
+    // would flash/rebuild every marker on every filter click).
   }, [map]);
 
-  // Category filter changed: update the existing source's data in place.
+  // Category filter changed (or on first mount): rebuild the supercluster
+  // index and immediately re-render from it. A fresh Supercluster instance
+  // per change mirrors @googlemaps/markerclusterer's own behavior (it
+  // rebuilds its index whenever the marker set differs, see its `calculate`
+  // method) — supercluster's index is immutable once loaded, there's no
+  // incremental update API.
   useEffect(() => {
-    try {
-      const source = map.getSource(SOURCE_ID);
-      if (source && "setData" in source) {
-        (source as maplibregl.GeoJSONSource).setData(toFeatureCollection(visiblePois) as never);
-      }
-    } catch {
-      // Map already torn down (provider switched away mid-filter-change) —
-      // nothing to update.
-    }
-  }, [map, visiblePois]);
+    const index = new Supercluster<PointProps, ClusterProps>({
+      radius: MARKER_CLUSTER_RADIUS,
+      maxZoom: MARKER_CLUSTER_MAX_ZOOM,
+      map: (props) => buildCategoryCounts(props.category),
+      reduce: (accumulated, props) => {
+        for (const id of CATEGORY_ORDER) {
+          const key = `cat_${id}` as const;
+          accumulated[key] = (accumulated[key] ?? 0) + (props[key] ?? 0);
+        }
+      },
+    });
+    index.load(
+      visiblePois.map((poi) => ({
+        type: "Feature",
+        properties: { id: poi.id, category: poi.category },
+        geometry: { type: "Point", coordinates: [poi.coordinates.lng, poi.coordinates.lat] },
+      })),
+    );
+    indexRef.current = index;
+    updateMarkersRef.current();
+  }, [visiblePois]);
 
   return null;
 }
