@@ -1,7 +1,7 @@
 [
-  { "elementType": "geometry", "stylers": [{ "color": "#f8f5fb" }] },
+  { "elementType": "geometry", "stylers": [{ "color": "#f1e4f6" }] },
   { "elementType": "labels.text.fill", "stylers": [{ "color": "#4a3a5c" }] },
-  { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f8f5fb" }] },
+  { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f1e4f6" }] },
   { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] },
   {
     "featureType": "water",
@@ -11,7 +11,7 @@
   {
     "featureType": "landscape.natural",
     "elementType": "geometry",
-    "stylers": [{ "color": "#f5e9f2" }]
+    "stylers": [{ "color": "#eddcf0" }]
   },
   {
     "featureType": "landscape.natural.terrain",

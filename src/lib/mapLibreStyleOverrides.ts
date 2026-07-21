@@ -52,6 +52,12 @@ const ADMIN_REGION_WIDTH = 1;
 // line-cap this reads as a fine dotted line rather than a dash, closer to
 // Google's actual native rendering than a long-dash pattern would be.
 const ADMIN_REGION_DASHARRAY: [number, number] = [0.6, 1.8];
+// A layer's own (pre-override) base line-width at or above this is treated
+// as "drawn thick on purpose" by TomTom, i.e. country-level — see
+// estimateBaseLineWidth below. 1.2 sits just above the ~1px a typical
+// region/county line renders at and just below where a deliberately
+// emphasized country border would start.
+const ADMIN_COUNTRY_WIDTH_SIGNAL = 1.2;
 
 // Same base palette as src/mapStyles/playful.json for everything except
 // roads (periwinkle water, pink-tinted terrain, lilac buildings, purple
@@ -65,26 +71,33 @@ const ADMIN_REGION_DASHARRAY: [number, number] = [0.6, 1.8];
 // Google's pink highway fill. Per feedback: "Tomtom playfull looks somehow
 // bad... should more align white + lila on lines/roads".
 const PLAYFUL: StylePalette = {
-  background: "#f8f5fb",
+  // Matches src/mapStyles/playful.json's base geometry color exactly —
+  // Google's own background was bumped from #f8f5fb to this same #f1e4f6
+  // at the same time (see that file's history) specifically because it was
+  // reading as "pure white" next to TomTom's more visibly lilac look;
+  // aligning both to one shared value is the actual fix per feedback
+  // ("GoogleMaps background looks pure white... we want more lila there
+  // too to align it").
+  background: "#f1e4f6",
   water: "#7b86e0",
   park: "#2fae66",
   parkOutline: "#1f6d4c",
   // "Earth Cover" fills the *entire* landmass (it's TomTom's base landcover
-  // classification, not a sparse feature) — at full saturation this reads
-  // as a solid purple wash covering the whole map, very different from
-  // Google's much lighter paper-white base with terrain as subtle shading.
-  // Kept barely-tinted here instead, close to `background`, so lilac shows
-  // up as an accent (buildings, roads, boundaries) rather than as the
-  // dominant color of the entire viewport. terrain and terrainAlt used to
-  // differ slightly — at high zoom TomTom's landcover is actually dozens of
-  // small adjacent polygons (fields, built-up patches, natural cover), each
-  // its own fill layer, and any two-tone split between them shows up as a
+  // classification, not a sparse feature), so in practice *this* color —
+  // not `background` above — is what actually reads as "the map's base
+  // tone" almost everywhere. Bumped in the same pass as `background` above,
+  // slightly lighter than it so full-landmass coverage doesn't tip back
+  // into the solid-purple-wash problem a fully saturated terrain color
+  // caused earlier this session. terrain and terrainAlt used to differ
+  // slightly — at high zoom TomTom's landcover is actually dozens of small
+  // adjacent polygons (fields, built-up patches, natural cover), each its
+  // own fill layer, and any two-tone split between them shows up as a
   // visible patchwork/seam between neighboring polygons. Same color for
   // both eliminates that; see applyMapLibreStyleOverrides' explicit
   // fill-opacity:1 for the other half of the fix (pre-existing per-layer
   // opacity differences were doing the same thing to a single color).
-  terrain: "#faf6fc",
-  terrainAlt: "#faf6fc",
+  terrain: "#f4e9f8",
+  terrainAlt: "#f4e9f8",
   building: "#e9d6f5",
   buildingOutline: "#c9a0e0",
   roadLocalFill: "#ffffff",
@@ -132,8 +145,7 @@ type Category =
   | "building"
   | "roadHighway"
   | "roadLocal"
-  | "adminBoundaryCountry"
-  | "adminBoundaryRegion"
+  | "adminBoundary"
   | "label"
   | "poiIcon"
   | "skip";
@@ -183,16 +195,24 @@ function classify(id: string, sourceLayer: string, layerType: string): Category 
   if (/road/.test(hay)) return "roadLocal";
   // Broader than just "boundary"/"administrative" — country/state/province/
   // county/district border layers don't reliably use either word in their
-  // id (unverified against TomTom's exact naming, since the raw style fetch
-  // used to inspect ids got cut off before reaching the boundary/label
-  // section of the layers array — this list is a best-effort guess at
-  // common vector-tile boundary naming, not a confirmed match). Split into
-  // country vs. everything-below-country (region/kraj, county, district) to
-  // mirror Google's administrative.country vs. plain administrative
-  // distinction — "country" is checked first since a country-level id could
-  // still contain a more generic word like "administrative" too.
+  // id. Confirmed the hard way: a fetch-and-grep of TomTom's actual
+  // basic_main response found zero layers matching boundary/border/admin/
+  // country/state/province/district/territory/political/dependency/order
+  // ANYWHERE in id, source-layer, or filter — the only "admin" hit in the
+  // whole document was "Government Administration Office" (a building, not
+  // a boundary line). That fetch turned out to be truncated by the fetch
+  // tool itself well before reaching the labels/boundary section of the
+  // real style (verified: the saved response cuts off mid-property inside
+  // the road layers, nowhere near the end of a 300+ layer style) — so this
+  // isn't proof TomTom has no boundary layers, just proof this approach
+  // can't see them. Country vs. region is no longer decided here by
+  // keyword (see the removed /country/ check — it never matched, which is
+  // exactly why every boundary rendered dashed in practice); it's decided
+  // in applyMapLibreStyleOverrides instead, from each layer's own live
+  // line-width as MapLibre already has it loaded (that object is never
+  // truncated — it's the browser's own parsed style, not a re-fetch).
   if (/boundary|administrative|admin[_ -]|country line|state line|province line|county line|district line/.test(hay)) {
-    return /country/.test(hay) ? "adminBoundaryCountry" : "adminBoundaryRegion";
+    return "adminBoundary";
   }
   if (
     /earth cover|built-up|industrial|airport|runway|military|school ground|paved area|town grass|parking area|railway|subway|shopping|university/.test(
@@ -211,14 +231,42 @@ function classify(id: string, sourceLayer: string, layerType: string): Category 
   // default gray. Rather than keep guessing at more keywords one report at
   // a time, any remaining "fill" layer gets the terrain tint (so no land
   // area is left unstyled) and any remaining "line" layer gets the
-  // adminBoundaryRegion treatment (so no border/line is left at TomTom's
-  // default gray) — region rather than country since an unrecognized
-  // boundary-ish line is far more likely to be one of the many region/
-  // county/district borders than one of the handful of country borders.
+  // adminBoundary treatment (so no border/line is left at TomTom's default
+  // gray) — better an unusual line rendering slightly lilac than another
+  // round of "there's still a gap/gray line here".
   if (layerType === "fill") return "terrain";
-  if (layerType === "line") return "adminBoundaryRegion";
+  if (layerType === "line") return "adminBoundary";
 
   return "skip";
+}
+
+// TomTom doesn't expose which admin level a boundary line represents by id
+// (see classify() above), but real-world map styles — TomTom's own included
+// — almost universally draw country borders *thicker* than region/county/
+// district borders as a basic cartographic convention, independent of
+// naming. Reading each layer's own line-width, as MapLibre already has it
+// parsed in the live style (map.getStyle() — never truncated, unlike the
+// one-off fetch used to try to read layer ids directly), lets country vs.
+// region be told apart from that built-in visual weighting instead of a
+// guessed keyword. Handles a plain number, a legacy stops-function object,
+// and a MapLibre "interpolate" expression (takes the first literal number in
+// the expression, which is the width at its lowest zoom stop — i.e. the
+// "zoomed out/world view" width, exactly where country vs. region borders
+// visually diverge the most).
+function estimateBaseLineWidth(raw: unknown): number | null {
+  if (typeof raw === "number") return raw;
+  if (raw && typeof raw === "object" && !Array.isArray(raw) && "stops" in raw) {
+    const stops = (raw as { stops?: unknown }).stops;
+    if (Array.isArray(stops) && Array.isArray(stops[0]) && typeof stops[0][1] === "number") {
+      return stops[0][1];
+    }
+    return null;
+  }
+  if (Array.isArray(raw)) {
+    const firstNumber = raw.find((v): v is number => typeof v === "number");
+    return firstNumber ?? null;
+  }
+  return null;
 }
 
 export function applyMapLibreStyleOverrides(map: maplibregl.Map, styleId: MapStyleId): void {
@@ -290,28 +338,41 @@ export function applyMapLibreStyleOverrides(map: maplibregl.Map, styleId: MapSty
             map.setPaintProperty(layer.id, "line-opacity", 1);
           }
           break;
-        case "adminBoundaryCountry":
-          // Thin solid line — mirrors administrative.country's explicit
-          // `weight: 1.4` in src/mapStyles/*.json. No dasharray override:
-          // country borders in Google's own rendering (and TomTom's default)
-          // are solid, only the sub-country levels are dashed/dotted.
+        case "adminBoundary":
+          // Country vs. region/county/district can't be told apart by id
+          // (see classify()'s comment) — instead read this *specific*
+          // layer's own original line-width, exactly as TomTom shipped it,
+          // before doing anything else to it. `layer.paint` here is
+          // whatever this pass hasn't touched yet, i.e. still TomTom's
+          // default for this layer.
           if (layerType === "line") {
+            const originalWidth = estimateBaseLineWidth(
+              (layer as { paint?: Record<string, unknown> }).paint?.["line-width"],
+            );
+            const isCountryLevel = originalWidth !== null && originalWidth >= ADMIN_COUNTRY_WIDTH_SIGNAL;
             map.setPaintProperty(layer.id, "line-color", palette.adminBoundary);
-            map.setPaintProperty(layer.id, "line-width", ADMIN_COUNTRY_WIDTH);
             map.setPaintProperty(layer.id, "line-opacity", 1);
-          }
-          break;
-        case "adminBoundaryRegion":
-          // Dotted line — mirrors Google's native dashed rendering for
-          // administrative levels below country (kraj/region, county,
-          // district), which Google applies automatically regardless of the
-          // style JSON. MapLibre needs the dash pattern set explicitly.
-          if (layerType === "line") {
-            map.setPaintProperty(layer.id, "line-color", palette.adminBoundary);
-            map.setPaintProperty(layer.id, "line-width", ADMIN_REGION_WIDTH);
-            map.setPaintProperty(layer.id, "line-dasharray", ADMIN_REGION_DASHARRAY);
-            map.setPaintProperty(layer.id, "line-opacity", 1);
-            map.setLayoutProperty(layer.id, "line-cap", "round");
+            if (isCountryLevel) {
+              // Thin solid line — mirrors administrative.country's explicit
+              // `weight: 1.4` in src/mapStyles/*.json. No dasharray: country
+              // borders in Google's rendering (and TomTom's own default) are
+              // solid, only sub-country levels are dashed/dotted.
+              map.setPaintProperty(layer.id, "line-width", ADMIN_COUNTRY_WIDTH);
+              map.setPaintProperty(layer.id, "line-dasharray", undefined);
+            } else {
+              // Dotted — mirrors Google's native dashed rendering for
+              // administrative levels below country (kraj/region, county,
+              // district), which Google applies automatically regardless of
+              // the style JSON. MapLibre needs the dash pattern set
+              // explicitly. Also the safer default when originalWidth
+              // couldn't be read at all (unusual expression shape) — most
+              // unclassifiable boundary-ish lines are more likely to be one
+              // of the many region/county/district borders than one of the
+              // handful of country borders.
+              map.setPaintProperty(layer.id, "line-width", ADMIN_REGION_WIDTH);
+              map.setPaintProperty(layer.id, "line-dasharray", ADMIN_REGION_DASHARRAY);
+              map.setLayoutProperty(layer.id, "line-cap", "round");
+            }
           }
           break;
         case "label":

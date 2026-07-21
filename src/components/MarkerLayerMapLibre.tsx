@@ -6,6 +6,7 @@ import categoriesData from "../../data/categories.json";
 import type { Category, Poi } from "../types/poi";
 import { buildClusterPieIcon, type PieSegment } from "../lib/clusterPieIcon";
 import { CATEGORY_ICONS } from "../lib/categoryIcons";
+import { MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
 
 // NOTE: this file follows MapLibre's own "Display HTML clusters with custom
 // properties" pattern (clustered GeoJSON source + querySourceFeatures() +
@@ -115,7 +116,7 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
       type: "geojson",
       data: toFeatureCollection(visiblePois) as never,
       cluster: true,
-      clusterRadius: 50,
+      clusterRadius: MARKER_CLUSTER_RADIUS,
       clusterProperties: clusterProperties as never,
     });
     // MapLibre only tiles/clusters a GeoJSON source once a layer references

@@ -1,5 +1,5 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { MarkerClusterer, type Renderer } from "@googlemaps/markerclusterer";
+import { MarkerClusterer, SuperClusterAlgorithm, type Renderer } from "@googlemaps/markerclusterer";
 import { useEffect, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { ALL_POIS } from "../data/pois";
@@ -7,6 +7,7 @@ import categoriesData from "../../data/categories.json";
 import type { Category } from "../types/poi";
 import { buildClusterPieIcon } from "../lib/clusterPieIcon";
 import { CATEGORY_ICONS } from "../lib/categoryIcons";
+import { MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
 
 const CATEGORIES = categoriesData as unknown as Category[];
 const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
@@ -82,7 +83,15 @@ export function MarkerLayer() {
       },
     };
 
-    const clusterer = new MarkerClusterer({ map, markers, renderer: pieRenderer });
+    // Explicit algorithm+radius so this matches MarkerLayerMapLibre's
+    // clusterRadius exactly (see MARKER_CLUSTER_RADIUS) instead of silently
+    // relying on this library's own default (60, vs. MapLibre's old 50).
+    const clusterer = new MarkerClusterer({
+      map,
+      markers,
+      renderer: pieRenderer,
+      algorithm: new SuperClusterAlgorithm({ radius: MARKER_CLUSTER_RADIUS }),
+    });
 
     return () => {
       clusterer.clearMarkers();

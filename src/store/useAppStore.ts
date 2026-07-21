@@ -23,6 +23,26 @@ function getInitialLanguage(): Language {
   return resolved === "en" || resolved === "cz" || resolved === "sk" ? resolved : "en";
 }
 
+// Same pattern as getInitialLanguage above: read synchronously at store
+// creation so the very first render already shows the provider the user
+// last picked, instead of always flashing "google" for a tick. Deliberately
+// a plain localStorage read/write rather than zustand's `persist` middleware
+// — only this one field should survive a reload (country/activeCategories
+// etc. resetting on refresh is fine/expected), and `persist` would need an
+// explicit partialize to avoid persisting the whole store by default.
+const MAP_PROVIDER_STORAGE_KEY = "family-trails:mapProvider";
+
+function getInitialMapProvider(): MapProvider {
+  try {
+    const stored = localStorage.getItem(MAP_PROVIDER_STORAGE_KEY);
+    return stored === "google" || stored === "maplibre" ? stored : "google";
+  } catch {
+    // Private browsing / storage disabled — fall back to the default rather
+    // than letting a SecurityError take down the whole store.
+    return "google";
+  }
+}
+
 interface AppState {
   country: Country;
   language: Language;
@@ -51,9 +71,10 @@ interface AppState {
 export const useAppStore = create<AppState>((set) => ({
   country: "CZ",
   language: getInitialLanguage(),
-  // Google stays the default — MapLibre/TomTom is an opt-in, learning-focused
-  // switcher (see PLAN.md §8), not a replacement for the primary experience.
-  mapProvider: "google",
+  // Google stays the *first-ever* default — MapLibre/TomTom is an opt-in,
+  // learning-focused switcher (see PLAN.md §8) — but once someone picks a
+  // provider, that choice sticks across reloads (see getInitialMapProvider).
+  mapProvider: getInitialMapProvider(),
   mapStyle: "playful",
   mapTypeId: "terrain",
   activeCategories: [],
@@ -64,7 +85,15 @@ export const useAppStore = create<AppState>((set) => ({
   showWaterLabels: false,
   setCountry: (country) => set({ country }),
   setLanguage: (language) => set({ language }),
-  setMapProvider: (mapProvider) => set({ mapProvider }),
+  setMapProvider: (mapProvider) => {
+    try {
+      localStorage.setItem(MAP_PROVIDER_STORAGE_KEY, mapProvider);
+    } catch {
+      // Same private-browsing/storage-disabled case as the read above —
+      // the in-memory switch below still works for this session either way.
+    }
+    set({ mapProvider });
+  },
   setMapStyle: (mapStyle) => set({ mapStyle }),
   setMapTypeId: (mapTypeId) => set({ mapTypeId }),
   toggleCategory: (categoryId) =>

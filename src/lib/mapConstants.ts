@@ -28,3 +28,16 @@ export const SLOVAKIA_BOUNDS_MAPLIBRE: [number, number, number, number] = [
   SLOVAKIA_BOUNDS.east,
   SLOVAKIA_BOUNDS.north,
 ];
+
+// Marker-cluster grouping radius, in pixels — shared between MarkerLayer
+// (passed to @googlemaps/markerclusterer's SuperClusterAlgorithm) and
+// MarkerLayerMapLibre (passed as GeoJSON source `clusterRadius`, which is
+// backed by the same underlying `supercluster` library both providers use
+// under the hood, so the same number means the same grouping distance on
+// screen either way). Previously these silently diverged — Google never
+// passed an explicit algorithm, so it fell back to the library's own
+// default of 60, while MapLibre explicitly set 50 — which is why the two
+// providers visibly clustered differently at the same zoom. 55 splits the
+// difference per feedback ("TomTom's clustering looks better, maybe just a
+// bigger radius... maybe something in between").
+export const MARKER_CLUSTER_RADIUS = 55;
