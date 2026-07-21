@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppStore, type Language, type MapProvider, type MapStyleId, type MapTypeId } from "../store/useAppStore";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { useIsCompact } from "../hooks/useIsCompact";
 import { useLanguageChange } from "../hooks/useLanguageChange";
 
 const MAP_TYPES: MapTypeId[] = ["terrain", "roadmap", "satellite"];
@@ -12,6 +13,7 @@ const LANGUAGES: Language[] = ["en", "cz", "sk"];
 export function MapLayerSettings() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const isCompact = useIsCompact();
   const [open, setOpen] = useState(false);
   const mapProvider = useAppStore((s) => s.mapProvider);
   const setMapProvider = useAppStore((s) => s.setMapProvider);
@@ -52,9 +54,13 @@ export function MapLayerSettings() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-2xl bg-brand-paper-raised p-2 text-brand-ink shadow-xl ring-1 ring-brand-mint-line">
-            {/* Style + language live here only on mobile, where the header's
-                inline pills aren't rendered at all (see useIsMobile). */}
-            {isMobile && (
+            {/* Provider lives here whenever it doesn't fit the header
+                (isCompact, <768px) — a wider range than style/language
+                below, since the header can't fit title + all three
+                switcher groups + this icon below md. isMobile is always
+                also isCompact (640 < 768), so this still covers the full
+                mobile dropdown too. */}
+            {isCompact && (
               <div>
                 <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.provider")}</p>
                 <div className="flex gap-1 px-2 pb-2">
@@ -73,7 +79,15 @@ export function MapLayerSettings() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
 
+            {/* Style + language live here only on mobile, where the header's
+                inline pills aren't rendered at all (see useIsMobile) — these
+                two fit inline down to 640px, unlike the provider switcher
+                above. */}
+            {isMobile && (
+              <div>
                 {mapProvider === "google" && (
                   <>
                     <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.style")}</p>

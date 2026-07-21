@@ -11,10 +11,10 @@ import { CATEGORY_ICONS } from "../lib/categoryIcons";
 // properties" pattern (clustered GeoJSON source + querySourceFeatures() +
 // manually-synced maplibregl.Marker pool), adapted to render individual POIs
 // as HTML markers too (not just clusters), reusing buildClusterPieIcon from
-// the Google implementation. This is the one file in the MapLibre branch
-// that couldn't be compiled/run from the sandbox this was written in (npm
-// registry is blocked there) — verify with `npm run build` + a manual zoom/
-// pan/filter pass locally before relying on it.
+// the Google implementation. Clustering/pan/zoom/marker-visibility have been
+// verified live in a real browser against the local dev server; `npm run
+// build`/`tsc` itself still hasn't been run from the sandbox this was
+// written in (npm registry blocked there) — worth a final typecheck pass.
 
 const CATEGORIES = categoriesData as unknown as Category[];
 const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
@@ -56,7 +56,8 @@ function buildClusterMarkerElement(segments: PieSegment[], size: number, count: 
   el.style.cursor = "pointer";
   el.style.width = `${size}px`;
   el.style.height = `${size}px`;
-  el.style.backgroundImage = `url(${buildClusterPieIcon(segments, size)})`;
+  // Quoted url() — see buildPoiMarkerElement below for why this matters.
+  el.style.backgroundImage = `url("${buildClusterPieIcon(segments, size)}")`;
   el.style.backgroundSize = "contain";
   el.style.display = "flex";
   el.style.alignItems = "center";
@@ -74,7 +75,14 @@ function buildPoiMarkerElement(category: string): HTMLDivElement {
   el.style.cursor = "pointer";
   el.style.width = "32px";
   el.style.height = "42px";
-  el.style.backgroundImage = `url(${CATEGORY_ICONS[category]})`;
+  // CATEGORY_ICONS values are URL-encoded SVG data URIs containing raw
+  // single quotes (from the SVGs' own xmlns='...' attributes) — an
+  // *unquoted* CSS url() token can't contain those, and the browser
+  // silently drops the whole declaration rather than erroring. Wrapping
+  // in double quotes (which the data URIs never contain) fixes it. This
+  // was the actual cause of "clusters render, individual pins don't" —
+  // clusterPieIcon.ts's output happens to be base64, so it never hit this.
+  el.style.backgroundImage = `url("${CATEGORY_ICONS[category]}")`;
   el.style.backgroundSize = "contain";
   el.style.backgroundRepeat = "no-repeat";
   return el;
@@ -125,38 +133,11 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
     // reference implementation for HTML cluster markers.
     const markerCache = new Map<string, maplibregl.Marker>();
     let markersOnScreen = new Map<string, maplibregl.Marker>();
-    let lastDebugSignature = "";
 
     const updateMarkers = () => {
       if (!map.isSourceLoaded(SOURCE_ID)) return;
       const features = map.querySourceFeatures(SOURCE_ID);
       const newOnScreen = new Map<string, maplibregl.Marker>();
-
-      // Temporary — remove once the "clusters render, individual pins don't"
-      // bug is confirmed fixed. Logged once per feature-count change (render
-      // fires every frame) so it doesn't flood the console. Answers: are
-      // unclustered leaf features even coming back from querySourceFeatures,
-      // and do their properties/icon lookups look right?
-      if (import.meta.env.DEV) {
-        const points = features.filter((f) => !f.properties?.cluster);
-        const signature = `${features.length}:${points.length}`;
-        if (signature !== lastDebugSignature) {
-          lastDebugSignature = signature;
-          if (points.length > 0) {
-            const sample = points[0].properties as Record<string, unknown>;
-            console.debug(
-              `[MarkerLayerMapLibre] ${features.length} features (${points.length} unclustered). Sample:`,
-              sample,
-              "icon found:",
-              Boolean(CATEGORY_ICONS[sample.category as string]),
-            );
-          } else if (features.length > 0) {
-            console.debug(`[MarkerLayerMapLibre] ${features.length} features, all clustered.`);
-          } else {
-            console.debug("[MarkerLayerMapLibre] querySourceFeatures returned 0 features.");
-          }
-        }
-      }
 
       for (const feature of features) {
         if (feature.geometry.type !== "Point") continue;
@@ -211,12 +192,23 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
     map.on("render", updateMarkers);
 
     return () => {
-      map.off("render", updateMarkers);
+      // Under rapid provider switching, the parent's underlying
+      // maplibregl.Map can already be torn down (instance.remove()
+      // called) by the time this child cleanup runs — every map-touching
+      // call here can throw in that case ("Cannot read properties of
+      // undefined"), so guard the whole block rather than crash the
+      // switch. The marker-pool cleanup above/below doesn't touch `map`
+      // directly and stays outside the guard.
+      try {
+        map.off("render", updateMarkers);
+        if (map.getLayer(LOAD_TRIGGER_LAYER_ID)) map.removeLayer(LOAD_TRIGGER_LAYER_ID);
+        if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      } catch {
+        // Map already removed by the parent — nothing left to clean up.
+      }
       for (const marker of markerCache.values()) marker.remove();
       markerCache.clear();
       markersOnScreen.clear();
-      if (map.getLayer(LOAD_TRIGGER_LAYER_ID)) map.removeLayer(LOAD_TRIGGER_LAYER_ID);
-      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
     };
     // Only re-run this whole setup if the map instance itself changes — POI
     // filtering is handled by the effect below via setData, not by tearing
@@ -226,9 +218,14 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
 
   // Category filter changed: update the existing source's data in place.
   useEffect(() => {
-    const source = map.getSource(SOURCE_ID);
-    if (source && "setData" in source) {
-      (source as maplibregl.GeoJSONSource).setData(toFeatureCollection(visiblePois) as never);
+    try {
+      const source = map.getSource(SOURCE_ID);
+      if (source && "setData" in source) {
+        (source as maplibregl.GeoJSONSource).setData(toFeatureCollection(visiblePois) as never);
+      }
+    } catch {
+      // Map already torn down (provider switched away mid-filter-change) —
+      // nothing to update.
     }
   }, [map, visiblePois]);
 

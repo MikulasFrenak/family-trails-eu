@@ -36,7 +36,6 @@ export function MapLibreMapView() {
     if (!containerRef.current || !apiKey) return;
 
     let cancelled = false;
-    let instance: maplibregl.Map | undefined;
     let loaded = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const disarm = () => {
@@ -50,53 +49,42 @@ export function MapLibreMapView() {
       }
     };
 
-    // buildStyle fetches TomTom's style JSON and patches in the "sources"
-    // block it doesn't include on its own (see mapLibreProviders.ts) — the
-    // map can't be constructed until that resolves.
-    provider
-      .buildStyle(apiKey)
-      .then((style) => {
-        if (cancelled || !containerRef.current) return;
+    // Hand MapLibre the style URL directly — it fetches/parses/manages the
+    // style itself (standard usage; see mapLibreProviders.ts for why this
+    // file doesn't hand-fetch and patch the style anymore).
+    const instance = new maplibregl.Map({
+      container: containerRef.current,
+      style: provider.styleUrl(apiKey),
+      bounds: SLOVAKIA_BOUNDS_MAPLIBRE,
+      fitBoundsOptions: { padding: MAP_BOUNDS_PADDING },
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+    });
 
-        instance = new maplibregl.Map({
-          container: containerRef.current,
-          // Cast, not a precisely-known type name — see the same pattern
-          // (and reasoning) in MarkerLayerMapLibre.tsx.
-          style: style as never,
-          bounds: SLOVAKIA_BOUNDS_MAPLIBRE,
-          fitBoundsOptions: { padding: MAP_BOUNDS_PADDING },
-          minZoom: MIN_ZOOM,
-          maxZoom: MAX_ZOOM,
-        });
+    instance.on("load", () => {
+      loaded = true;
+      disarm();
+      if (!cancelled) setMap(instance);
+    });
+    // MapLibre's "error" event fires for all sorts of non-fatal things too
+    // (a single failed tile, a missing sprite icon) — only a real 401/403
+    // on the style/tile request itself means the key is bad. Anything else
+    // before load finishes goes to the retryable "timeout" bucket instead
+    // of the dead-end "auth" one.
+    instance.on("error", (e) => {
+      if (loaded || cancelled) return;
+      const status = (e as { error?: { status?: number } }).error?.status;
+      setFailure(status === 401 || status === 403 ? "auth" : "timeout");
+    });
 
-        instance.on("load", () => {
-          loaded = true;
-          disarm();
-          if (!cancelled) setMap(instance ?? null);
-        });
-        // A bad/unauthorized key surfaces here (a tile request failing),
-        // same bucket as Google's gm_authFailure — retrying won't help
-        // without a valid, entitled key, so this goes to the non-retryable
-        // fallback.
-        instance.on("error", () => {
-          if (!loaded && !cancelled) setFailure("auth");
-        });
-
-        arm();
-      })
-      .catch(() => {
-        // Style fetch itself failed (bad key, network, TomTom outage) —
-        // same non-retryable bucket as an in-map error.
-        if (!cancelled) setFailure("auth");
-      });
-
+    arm();
     document.addEventListener("visibilitychange", arm);
 
     return () => {
       cancelled = true;
       disarm();
       document.removeEventListener("visibilitychange", arm);
-      instance?.remove();
+      instance.remove();
       setMap(null);
     };
   }, [apiKey, attempt]);

@@ -7,11 +7,13 @@ import { MapProviderSwitcher } from "./components/MapProviderSwitcher";
 import { POIDetailPanel } from "./components/POIDetailPanel";
 import { MapLayerSettings } from "./components/MapLayerSettings";
 import { useIsMobile } from "./hooks/useIsMobile";
+import { useIsCompact } from "./hooks/useIsCompact";
 import { useAppStore } from "./store/useAppStore";
 
 export default function App() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const isCompact = useIsCompact();
   // Google-only visual styles (playful/nature) are meaningless once the map
   // engine itself is MapLibre — hide the pill instead of leaving it inert.
   const mapProvider = useAppStore((s) => s.mapProvider);
@@ -26,7 +28,11 @@ export default function App() {
         <div className="flex items-center gap-2 sm:gap-3">
           {!isMobile && (
             <div className="flex items-center gap-2 sm:gap-3">
-              <MapProviderSwitcher />
+              {/* Three switcher groups plus the title don't fit one header
+                  line below md (768px) — moves into MapLayerSettings'
+                  dropdown in that 640–767px gap instead of wrapping the
+                  header (see useIsCompact). */}
+              {!isCompact && <MapProviderSwitcher />}
               {mapProvider === "google" && <StyleSwitcher />}
               <LanguageSwitcher />
             </div>
