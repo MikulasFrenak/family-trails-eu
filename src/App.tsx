@@ -8,15 +8,11 @@ import { POIDetailPanel } from "./components/POIDetailPanel";
 import { MapLayerSettings } from "./components/MapLayerSettings";
 import { useIsMobile } from "./hooks/useIsMobile";
 import { useIsCompact } from "./hooks/useIsCompact";
-import { useAppStore } from "./store/useAppStore";
 
 export default function App() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const isCompact = useIsCompact();
-  // Google-only visual styles (playful/nature) are meaningless once the map
-  // engine itself is MapLibre — hide the pill instead of leaving it inert.
-  const mapProvider = useAppStore((s) => s.mapProvider);
 
   return (
     <div className="flex h-screen w-screen flex-col bg-brand-paper">
@@ -33,7 +29,7 @@ export default function App() {
                   dropdown in that 640–767px gap instead of wrapping the
                   header (see useIsCompact). */}
               {!isCompact && <MapProviderSwitcher />}
-              {mapProvider === "google" && <StyleSwitcher />}
+              <StyleSwitcher />
               <LanguageSwitcher />
             </div>
           )}

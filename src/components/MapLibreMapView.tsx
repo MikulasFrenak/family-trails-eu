@@ -5,6 +5,7 @@ import { MapLoadFallback } from "./MapLoadFallback";
 import { MarkerLayerMapLibre } from "./MarkerLayerMapLibre";
 import { ZoomControlMapLibre } from "./ZoomControlMapLibre";
 import { FilterControl } from "./FilterControl";
+import { StyleOverrideMapLibre } from "./StyleOverrideMapLibre";
 import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS_MAPLIBRE, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 import { MAPLIBRE_PROVIDERS, DEFAULT_MAPLIBRE_PROVIDER_ID } from "../lib/mapLibreProviders";
 
@@ -102,6 +103,7 @@ export function MapLibreMapView() {
       <div ref={containerRef} className="h-full w-full" />
       {map && (
         <>
+          <StyleOverrideMapLibre map={map} />
           <MarkerLayerMapLibre map={map} />
           <ZoomControlMapLibre map={map} />
           <FilterControl />

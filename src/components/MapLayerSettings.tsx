@@ -85,30 +85,27 @@ export function MapLayerSettings() {
             {/* Style + language live here only on mobile, where the header's
                 inline pills aren't rendered at all (see useIsMobile) — these
                 two fit inline down to 640px, unlike the provider switcher
-                above. */}
+                above. Style now applies to both providers (see
+                mapLibreStyleOverrides.ts), so it's no longer Google-gated. */}
             {isMobile && (
               <div>
-                {mapProvider === "google" && (
-                  <>
-                    <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.style")}</p>
-                    <div className="flex gap-1 px-2 pb-2">
-                      {MAP_STYLES.map((style) => (
-                        <button
-                          key={style}
-                          type="button"
-                          onClick={() => setMapStyle(style)}
-                          className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors ${
-                            mapStyle === style
-                              ? "bg-brand-forest text-white"
-                              : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
-                          }`}
-                        >
-                          {t(`mapStyle.${style}`)}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
+                <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.style")}</p>
+                <div className="flex gap-1 px-2 pb-2">
+                  {MAP_STYLES.map((style) => (
+                    <button
+                      key={style}
+                      type="button"
+                      onClick={() => setMapStyle(style)}
+                      className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors ${
+                        mapStyle === style
+                          ? "bg-brand-forest text-white"
+                          : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
+                      }`}
+                    >
+                      {t(`mapStyle.${style}`)}
+                    </button>
+                  ))}
+                </div>
 
                 <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.language")}</p>
                 <div className="flex gap-1 px-2 pb-2">

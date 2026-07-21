@@ -34,8 +34,11 @@ export const MAPLIBRE_PROVIDERS = {
     // any other hosted style — this is the standard, vendor-intended usage.
     // `style/*` pins to the latest resource version so this URL doesn't
     // need bumping by hand. "basic_main" is TomTom's default light street
-    // style — distinct from Google's playful/nature by design, not meant
-    // to match them.
+    // style, used as the base for every mapStyle variant — the
+    // playful/nature recoloring happens at runtime on top of this fetched
+    // style (see mapLibreStyleOverrides.ts), not via a different styleUrl
+    // per variant, since TomTom doesn't offer a hosted style matching our
+    // palette out of the box.
     styleUrl: (apiKey) => `https://api.tomtom.com/style/1/style/*?key=${apiKey}&map=basic_main`,
   },
 } as const satisfies Record<string, MapLibreProviderConfig>;

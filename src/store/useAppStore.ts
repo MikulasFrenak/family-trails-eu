@@ -7,8 +7,11 @@ export type MapStyleId = "playful" | "nature";
 export type MapTypeId = "terrain" | "roadmap" | "satellite";
 // Which map engine renders MapView — "google" (the clean, unmodified Google
 // Maps implementation) or "maplibre" (vector tiles, pluggable tile provider,
-// currently TomTom only). mapStyle (playful/nature) is Google-only and is
-// ignored when mapProvider is "maplibre".
+// currently TomTom only). mapStyle (playful/nature) applies to both: Google
+// reads it via src/mapStyles/*.json, MapLibre via runtime paint overrides in
+// src/lib/mapLibreStyleOverrides.ts (see StyleOverrideMapLibre). mapTypeId
+// and the road/label toggles below remain Google-only — MapLibreMapView
+// doesn't read them.
 export type MapProvider = "google" | "maplibre";
 
 // i18next's browser-language detection resolves synchronously (no backend,
