@@ -7,15 +7,12 @@ export const MIN_ZOOM = 6;
 export const MAX_ZOOM = 18;
 
 // Google Maps' JS API and MapLibre/TomTom don't count zoom the same way for
-// the same on-screen scale. Went through a few wrong guesses on this before
-// landing here: a shared "GOOGLE_ZOOM_OFFSET" added to MIN_ZOOM/MAX_ZOOM
-// overcorrected one way (pushed the floor above what defaultBounds/
-// fitBounds computes for SLOVAKIA_BOUNDS, breaking the default centered
-// view), then an unconditional GOOGLE_MIN_ZOOM=3 overcorrected the other way
-// (let Google zoom all the way out to a whole-earth view). MIN_ZOOM + 1 (=7)
-// confirmed correct via direct testing — matches TomTom's usable range
-// without either regression. Kept as its own constant rather than reusing
-// MIN_ZOOM inline in case that +1 needs to move again later.
+// the same on-screen scale, so these are tuned independently rather than
+// reusing MIN_ZOOM/MAX_ZOOM directly — confirmed via direct side-by-side
+// testing against TomTom's range. Careful raising GOOGLE_MIN_ZOOM further:
+// too high clamps the default Slovakia view (fitBounds picks a lower zoom
+// than that, and the SDK clamps up to the floor); too low lets it zoom out
+// to a whole-earth view.
 export const GOOGLE_MIN_ZOOM = MIN_ZOOM + 1;
 export const GOOGLE_MAX_ZOOM = MAX_ZOOM;
 
@@ -53,13 +50,9 @@ export const MARKER_CLUSTER_RADIUS = 55;
 // Google's own copy.
 export const MARKER_CLUSTER_MAX_ZOOM = MAX_ZOOM - 2;
 
-// Google's own copies of the two above. No longer derived from a shared
-// zoom-offset formula (see GOOGLE_MIN_ZOOM's comment — that model turned out
-// to be unreliable and got the map's own min/max zoom backwards in
-// practice), so these are independent, empirically-set numbers too.
-// GOOGLE_MARKER_CLUSTER_RADIUS is a modest bump over the TomTom side per
-// feedback that Google's clustering needed to feel a little more
-// aggressive/grouped for equivalent behavior; nudge either of these
-// directly if clustering still doesn't look equivalent between providers.
+// Google's own copies of the two above — independent, empirically-tuned
+// numbers rather than reused directly, same reasoning as GOOGLE_MIN_ZOOM.
+// GOOGLE_MARKER_CLUSTER_RADIUS is bumped above the TomTom side so Google's
+// clustering groups markers as aggressively as TomTom's at the same zoom.
 export const GOOGLE_MARKER_CLUSTER_MAX_ZOOM = MARKER_CLUSTER_MAX_ZOOM;
-export const GOOGLE_MARKER_CLUSTER_RADIUS = MARKER_CLUSTER_RADIUS + 10;
+export const GOOGLE_MARKER_CLUSTER_RADIUS = MARKER_CLUSTER_RADIUS + 30;
