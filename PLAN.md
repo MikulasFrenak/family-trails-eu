@@ -158,3 +158,74 @@ Captured for later — none of this is designed or scoped yet, just named as a d
 - **Observability** — analytics/monitoring/logging once there's a backend and real user actions to observe (not meaningful for the current static MVP beyond basic Cloudflare Pages request logs).
 
 Architecture implication when this gets picked up: needs an auth provider (e.g. Clerk/Supabase Auth/Firebase Auth, or Cloudflare's own stack) and a real backend + database (e.g. Cloudflare Workers + D1, or Supabase) — a genuine scope and cost decision (see the earlier "$0 quota cap" constraint in Phase 0), not a Cloudflare Pages static-only extension.
+
+---
+
+## 8. Map provider abstraction — TomTom/MapLibre research (Phase 8, not started)
+
+**Goal:** stop the map from ever showing a dead "quota exceeded" screen. Today, when Google Maps hits its hard-capped free quota, `MapLoadFallback` shows a text-only dead end (§2 Quota-exceeded fallback). The idea: add a second, independent map provider (MapLibre GL JS + a vector-tile source) so a Google failure can fail over to a still-functional map instead of a dead end — and/or offer it as a manual, user-visible switcher. This section is **research only** — no implementation decision made yet, per this playbook's Research Before Implementing convention.
+
+### Why this is worth considering
+
+- The current hard $0 Google Maps quota cap is the direct cause of the existing fallback UX — a second provider with more headroom turns "map sometimes doesn't work" into "map always works, sometimes on a different provider."
+- Reduces single-vendor dependency on Google specifically for a public, $0-budget hobby project.
+- MapLibre is fully open source — fits this project's and the wider playbook's "tech-agnostic, no vendor lock-in" story.
+
+### Provider comparison (researched — see sources)
+
+| | Google Maps (current) | TomTom (MapLibre-based) | MapTiler / Stadia Maps (MapLibre, OSM data) |
+|---|---|---|---|
+| Free tier | Hard $0 quota cap set manually — low headroom, the actual cause of today's fallback UX | 50,000 tile requests/day + 2,500 non-tile requests/day (pricing revised July 2026 — re-check before committing) | MapTiler: 100k free tile loads. Stadia: free tier for **non-commercial use only** — needs a careful read of what "non-commercial" covers for a portfolio site that supports a freelance pitch |
+| Styling | Proprietary Google style-JSON array — today's `playful.json`/`nature.json` are hand-authored in this format | **MapLibre Style Spec** — TomTom's own JS SDK is built directly on MapLibre GL JS, so this is a first-class fit, and styles can be built visually in TomTom's Map Maker instead of hand-written JSON | Same MapLibre Style Spec |
+| Clustering | `@googlemaps/markerclusterer` + imperative `google.maps.Marker` objects (today's approach, incl. the custom pie-chart `Renderer` in `MarkerLayer.tsx`) | Native GeoJSON-source clustering (`cluster: true`, GPU-rendered) for the common case; **HTML markers** for a fully custom cluster render (needed to keep the pie-chart look) | Same MapLibre approach |
+| Data | Google's own road/POI/imagery data | TomTom's own data | OpenStreetMap community data — coverage/detail varies by region, worth spot-checking CZ/SK rural areas specifically before relying on it |
+
+### Key finding: markers/clustering can't be literally shared code — but the "brain" can
+
+The original assumption ("clusters and markers could be shared") is only partly true. MapLibre's rendering model is fundamentally different from Google's: Google uses imperative `Marker` objects plus a separate clusterer library; MapLibre clusters via a GeoJSON source property or via HTML DOM markers when custom rendering (like the pie chart) is needed — there's no shared marker object type to reuse directly.
+
+What **is** genuinely shareable, provider-agnostically:
+- POI filtering logic (`visiblePois` computation in `MarkerLayer.tsx`)
+- The pie-chart icon math itself (`src/lib/clusterPieIcon.ts` — pure SVG/canvas generation, no Google types involved)
+- Category color/order config (`categories.json`-derived lookups)
+
+What needs a **separate implementation per provider**:
+- The actual marker/cluster rendering glue (`google.maps.Marker` + `MarkerClusterer` vs MapLibre GeoJSON source + HTML cluster markers)
+- Load-failure detection (`gm_authFailure` + `tilesloaded` watchdog is Google-specific; MapLibre has its own `error`/`load` events — needs its own research pass before implementing)
+- Map style format entirely (Google style-JSON vs MapLibre Style Spec — not automatically convertible; the TomTom parity of `playful.json`/`nature.json` is real design work, not a mechanical port)
+
+### Architecture options considered
+
+1. **Full provider-abstraction interface** — a `MapProvider` interface with a Google adapter and a MapLibre adapter behind it, switcher picks the implementation. Cleanest long-term, most upfront work, and premature if a 3rd provider never actually gets added.
+2. **Pragmatic component swap (recommended for a v1)** — `MapView` branches on a store flag (or an automatic failure signal) and renders either the existing Google map subtree or a new MapLibre subtree. Both subtrees import the same shared bits (POI filtering, pie-chart math, category config) but own their own rendering glue. Less code than option 1, ships faster, easy to refactor toward a real interface later if it earns it.
+3. **MapLibre-only migration (drop Google entirely)** — simplest end state, but this wasn't the ask (the ask was a switcher/second layer alongside Google, not a full migration) and loses Google's familiar, well-known map look as the default.
+
+**Recommendation:** Option 2 for a v1 — matches the actual ask (switchable, not a rip-and-replace) and avoids over-engineering an interface before there's a second real reason to need one.
+
+### What would need to change (file-level, current names)
+
+- `MapView.tsx` — branch on provider (manual toggle and/or automatic failover on `gm_authFailure`/timeout) instead of always rendering the Google subtree
+- New `MapViewMapLibre.tsx` (naming TBD) — MapLibre GL JS pointed at a TomTom style/tile URL + key, with its own bounds/zoom/style-switch handling and its own load-failure detection (separate research needed — MapLibre's failure signals aren't the same as Google's)
+- New `MarkerLayerMapLibre.tsx` — GeoJSON source of `ALL_POIS`, clustering via MapLibre's native support or HTML markers (to keep the pie-chart look), reusing `clusterPieIcon.ts`'s math and the category config, but with new render glue
+- New TomTom/MapLibre style JSON for style parity with `playful.json`/`nature.json` — build visually via TomTom Map Maker rather than hand-writing MapLibre Style Spec JSON from scratch
+- `useAppStore.ts` — new provider-related state (active provider, and/or an auto-failover flag)
+- A provider switcher UI (new control, or folded into the existing `MapLayerSettings` panel)
+- `.env.local` / Cloudflare Pages build vars — new `VITE_TOMTOM_API_KEY`
+- `AGENTS.md` — new stack-decision entry once an approach is actually chosen
+
+### Open questions to settle before this becomes an implementation task
+
+1. Auto-failover only (silent switch on Google failure), a user-visible manual switcher, or both?
+2. Does the TomTom style need full `playful`/`nature` visual parity for v1, or is one acceptable-looking default TomTom style enough for a fallback tier (only needs to look intentional, not pixel-match Google)?
+3. TomTom's exact commercial-use terms for this specific use case (portfolio site, supports a freelance pitch, not direct map-view sales) — re-verify against TomTom's current terms before committing, not just the headline free-tier numbers above.
+4. Does MapLibre stay a fallback-only tier long-term, or could it eventually become the default (with Google demoted to a switch-to option)?
+
+### Sources (researched during this pass — re-verify before implementing, pricing/terms change)
+
+- [TomTom Pricing](https://docs.tomtom.com/pricing)
+- [TomTom Maps SDK for JavaScript — Overview](https://docs.tomtom.com/maps-sdk-js/introduction/overview)
+- [MapLibre GL JS — Optimising Performance for Large GeoJSON Datasets](https://maplibre.org/maplibre-gl-js/docs/guides/large-data/)
+- [Clustering with MapLibre GL JS — Stadia Maps Docs](https://docs.stadiamaps.com/tutorials/clustering-styling-points-with-maplibre/)
+- [Display HTML clusters with custom properties — MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/examples/display-html-clusters-with-custom-properties/)
+
+**Next step:** not an implementation task yet. Settle the 4 open questions above, then run `/create-task` for a scoped v1 (recommend starting with Option 2 + manual switcher only, defer auto-failover and full style parity to a follow-up).
