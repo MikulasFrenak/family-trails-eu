@@ -38,14 +38,17 @@ interface StylePalette {
   labelHalo: string;
 }
 
-// Same palette as src/mapStyles/playful.json (kept byte-for-byte in sync so
-// Google and TomTom read as the same "skin"), translated to MapLibre's
-// fill-color/line-color model — leans lilac/rosa on top of the bubblegum-pink
-// highways: periwinkle water, pink-tinted terrain, lilac buildings, and a
-// purple admin-boundary/label-ink tone (the same #9b6fd1 used for the
-// historical-building category elsewhere in the app) for a storybook/
-// fairytale feel that reads well to kids, per the explicit "more for family
-// kids, like fairytale" brief and the follow-up "more lila/rosa" request.
+// Same base palette as src/mapStyles/playful.json for everything except
+// roads (periwinkle water, pink-tinted terrain, lilac buildings, purple
+// admin-boundary/label-ink using the same #9b6fd1 as the historical-building
+// category). Roads intentionally diverge from Google here: TomTom's road
+// casing at #f0d9f0 read as too pale/washed-out against the #f8f5fb
+// background (no built-in shadow/contrast the way Google's default renderer
+// gives roads for free), so TomTom's road network reads "white + lila"
+// literally — a plain white fill outlined in a clearly-saturated violet
+// casing, brighter/bolder on highways than local roads — rather than
+// Google's pink highway fill. Per feedback: "Tomtom playfull looks somehow
+// bad... should more align white + lila on lines/roads".
 const PLAYFUL: StylePalette = {
   background: "#f8f5fb",
   water: "#7b86e0",
@@ -56,10 +59,10 @@ const PLAYFUL: StylePalette = {
   building: "#e9d6f5",
   buildingOutline: "#c9a0e0",
   roadLocalFill: "#ffffff",
-  roadLocalCasing: "#f0d9f0",
-  roadHighwayFill: "#ec5fa3",
-  roadHighwayCasing: "#a34a9c",
-  roadHighwayLabel: "#ffffff",
+  roadLocalCasing: "#c9a0e0",
+  roadHighwayFill: "#ffffff",
+  roadHighwayCasing: "#8b4fc4",
+  roadHighwayLabel: "#8b4fc4",
   adminBoundary: "#9b6fd1",
   labelText: "#4a3a5c",
   labelHalo: "#f8f5fb",
