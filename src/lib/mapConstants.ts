@@ -9,17 +9,18 @@ export const MAX_ZOOM = 18;
 // Google Maps' JS API and MapLibre/TomTom don't count zoom the same way for
 // the same on-screen scale: Google's tile pyramid uses 256px tiles, while
 // MapLibre GL (and TomTom's vector style, built for it) uses 512px tiles —
-// exactly one zoom level's worth of ground-area difference per tile, and
-// real-world reports put the practical offset at about 2 (e.g. "Mapbox GL
-// zoom 15 looks the same as Google Maps zoom 17" — github.com/mapbox/
-// mapbox-gl-native/issues/9417). Reported as "it looks like we can zoom
-// further out/in on TomTom than on Google" even though MIN_ZOOM/MAX_ZOOM
-// used to be shared as literal numbers between both providers — they were
-// equal as numbers, but not as actual visual range, since Google needed to
-// go about 2 higher to reach the same closeness. GOOGLE_MIN_ZOOM/
-// GOOGLE_MAX_ZOOM below apply that offset so both providers cover the same
-// real range at their own (different) numbers.
-export const GOOGLE_ZOOM_OFFSET = 2;
+// real-world reports put the offset at roughly 2 (e.g. "Mapbox GL zoom 15
+// looks the same as Google Maps zoom 17" — github.com/mapbox/
+// mapbox-gl-native/issues/9417), i.e. Google needs the *higher* number for
+// the same view. First tried as exactly 2 (matching that report literally),
+// but a direct side-by-side screenshot comparison at that value still
+// showed Google noticeably tighter/more zoomed-in than TomTom at its own
+// floor (a single mountain range vs. TomTom's Dresden-to-Zagreb continental
+// view at their respective MIN_ZOOM) — bumped to 4 per that comparison and
+// the follow-up feedback ("increased by 1-2 maybe... MIN"). Still an
+// empirically-tuned number rather than a precisely derived one; nudge
+// further if either end still doesn't visually match.
+export const GOOGLE_ZOOM_OFFSET = 4;
 export const GOOGLE_MIN_ZOOM = MIN_ZOOM + GOOGLE_ZOOM_OFFSET;
 export const GOOGLE_MAX_ZOOM = MAX_ZOOM + GOOGLE_ZOOM_OFFSET;
 
@@ -67,9 +68,9 @@ export const MARKER_CLUSTER_MAX_ZOOM = MAX_ZOOM - 2;
 // Google-specific copies, both compensating for GOOGLE_ZOOM_OFFSET: Google's
 // SuperClusterAlgorithm evaluates radius/maxZoom against Google's own
 // Math.round(map.getZoom()), which — per GOOGLE_ZOOM_OFFSET above — runs
-// about 2 higher than the equivalent MapLibre zoom for the same view. Fed
-// into the same underlying supercluster math, that offset alone would
-// already make Google under-cluster relative to TomTom at the "same" view;
+// higher than the equivalent MapLibre zoom for the same view. Fed into the
+// same underlying supercluster math, that offset alone would already make
+// Google under-cluster relative to TomTom at the "same" view;
 // GOOGLE_MARKER_CLUSTER_MAX_ZOOM corrects the dissolve point for that
 // directly. Radius doesn't have as clean a formula (it interacts with the
 // offset multiplicatively, not additively, and there's no way to verify the
