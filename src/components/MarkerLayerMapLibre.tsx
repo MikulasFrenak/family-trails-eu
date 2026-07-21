@@ -125,11 +125,38 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
     // reference implementation for HTML cluster markers.
     const markerCache = new Map<string, maplibregl.Marker>();
     let markersOnScreen = new Map<string, maplibregl.Marker>();
+    let lastDebugSignature = "";
 
     const updateMarkers = () => {
       if (!map.isSourceLoaded(SOURCE_ID)) return;
       const features = map.querySourceFeatures(SOURCE_ID);
       const newOnScreen = new Map<string, maplibregl.Marker>();
+
+      // Temporary — remove once the "clusters render, individual pins don't"
+      // bug is confirmed fixed. Logged once per feature-count change (render
+      // fires every frame) so it doesn't flood the console. Answers: are
+      // unclustered leaf features even coming back from querySourceFeatures,
+      // and do their properties/icon lookups look right?
+      if (import.meta.env.DEV) {
+        const points = features.filter((f) => !f.properties?.cluster);
+        const signature = `${features.length}:${points.length}`;
+        if (signature !== lastDebugSignature) {
+          lastDebugSignature = signature;
+          if (points.length > 0) {
+            const sample = points[0].properties as Record<string, unknown>;
+            console.debug(
+              `[MarkerLayerMapLibre] ${features.length} features (${points.length} unclustered). Sample:`,
+              sample,
+              "icon found:",
+              Boolean(CATEGORY_ICONS[sample.category as string]),
+            );
+          } else if (features.length > 0) {
+            console.debug(`[MarkerLayerMapLibre] ${features.length} features, all clustered.`);
+          } else {
+            console.debug("[MarkerLayerMapLibre] querySourceFeatures returned 0 features.");
+          }
+        }
+      }
 
       for (const feature of features) {
         if (feature.geometry.type !== "Point") continue;
