@@ -143,6 +143,20 @@ function classify(id: string, sourceLayer: string, layerType: string): Category 
   }
 
   if (/water|lake|ocean|river|beach|dune/.test(hay)) return "water";
+  // Large protected-area designations (national/state/regional parks,
+  // national forests — can cover a huge fraction of the viewport, e.g. the
+  // entire Tatra range) are a completely different scale from an actual
+  // small park/playground polygon. Filling them solid green blots out
+  // every road, label and marker underneath — confirmed by screenshot,
+  // Google's own poi.park styler doesn't touch these either (no fill, no
+  // distinct outline; the "park" only shows through its text label). Route
+  // them to "terrain" instead so they blend into the plain background like
+  // everywhere else, and drop their outline layer entirely rather than
+  // giving it the admin-boundary purple, matching Google's "essentially
+  // invisible except for the label" treatment.
+  if (/national park|national or state park|state or province park|regional park|county park|national forest/.test(hay)) {
+    return layerType === "line" ? "skip" : "terrain";
+  }
   if (/park|forest|golf|cemetery|zoo|greens?|garden|amusement/.test(hay)) return "park";
   if (/building|administration office|cultural facility|hospital|hotel|institution|factory/.test(hay)) {
     return "building";
