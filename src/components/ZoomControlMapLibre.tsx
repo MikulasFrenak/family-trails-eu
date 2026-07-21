@@ -1,31 +1,27 @@
-import { useMap } from "@vis.gl/react-google-maps";
+import type maplibregl from "maplibre-gl";
 import { useEffect, useState } from "react";
-import { GOOGLE_MIN_ZOOM, GOOGLE_MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
+import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS_MAPLIBRE, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 
-export function ZoomControl() {
-  const map = useMap();
-  const [zoom, setZoom] = useState<number | null>(null);
+export function ZoomControlMapLibre({ map }: { map: maplibregl.Map }) {
+  const [zoom, setZoom] = useState(map.getZoom());
 
   useEffect(() => {
-    if (!map) return;
-    setZoom(map.getZoom() ?? null);
-    const listener = map.addListener("zoom_changed", () => setZoom(map.getZoom() ?? null));
-    return () => listener.remove();
+    const onZoom = () => setZoom(map.getZoom());
+    onZoom();
+    map.on("zoom", onZoom);
+    return () => {
+      map.off("zoom", onZoom);
+    };
   }, [map]);
 
-  const step = (delta: number) => {
-    if (!map) return;
-    const current = map.getZoom() ?? 7;
-    map.setZoom(current + delta);
-  };
+  const step = (delta: number) => map.setZoom(map.getZoom() + delta);
 
   const recenter = () => {
-    if (!map) return;
-    map.fitBounds(SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING);
+    map.fitBounds(SLOVAKIA_BOUNDS_MAPLIBRE, { padding: MAP_BOUNDS_PADDING });
   };
 
-  const atMax = zoom !== null && zoom >= GOOGLE_MAX_ZOOM;
-  const atMin = zoom !== null && zoom <= GOOGLE_MIN_ZOOM;
+  const atMax = zoom >= MAX_ZOOM;
+  const atMin = zoom <= MIN_ZOOM;
 
   return (
     <div className="absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-xl shadow-lg ring-1 ring-brand-mint-line sm:right-4 sm:top-4">

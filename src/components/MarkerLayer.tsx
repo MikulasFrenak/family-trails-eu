@@ -1,5 +1,5 @@
 import { useMap } from "@vis.gl/react-google-maps";
-import { MarkerClusterer, type Renderer } from "@googlemaps/markerclusterer";
+import { MarkerClusterer, SuperClusterAlgorithm, type Renderer } from "@googlemaps/markerclusterer";
 import { useEffect, useMemo } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { ALL_POIS } from "../data/pois";
@@ -7,6 +7,7 @@ import categoriesData from "../../data/categories.json";
 import type { Category } from "../types/poi";
 import { buildClusterPieIcon } from "../lib/clusterPieIcon";
 import { CATEGORY_ICONS } from "../lib/categoryIcons";
+import { GOOGLE_MARKER_CLUSTER_MAX_ZOOM, GOOGLE_MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
 
 const CATEGORIES = categoriesData as unknown as Category[];
 const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
@@ -48,8 +49,6 @@ export function MarkerLayer() {
       return marker;
     });
 
-    // Cluster icon = a pie chart of the categories grouped inside it, so you
-    // can tell what's in a cluster before zooming/clicking into it.
     const pieRenderer: Renderer = {
       render: (cluster) => {
         const counts = new Map<string, number>();
@@ -82,7 +81,12 @@ export function MarkerLayer() {
       },
     };
 
-    const clusterer = new MarkerClusterer({ map, markers, renderer: pieRenderer });
+    const clusterer = new MarkerClusterer({
+      map,
+      markers,
+      renderer: pieRenderer,
+      algorithm: new SuperClusterAlgorithm({ radius: GOOGLE_MARKER_CLUSTER_RADIUS, maxZoom: GOOGLE_MARKER_CLUSTER_MAX_ZOOM }),
+    });
 
     return () => {
       clusterer.clearMarkers();

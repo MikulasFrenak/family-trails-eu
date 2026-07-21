@@ -7,8 +7,6 @@ import { useIsMobile } from "../hooks/useIsMobile";
 
 const CATEGORIES = categoriesData as unknown as Category[];
 
-// Mobile-only: on tablet/desktop the CategoryFilter chip row is used instead
-// (see App.tsx) — this floating button is the compact mobile equivalent.
 export function FilterControl() {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
@@ -22,9 +20,6 @@ export function FilterControl() {
   const hasActiveFilters = activeCategories.length > 0;
 
   return (
-    // POIDetailPanel spans the full width at the same bottom-right corner on
-    // mobile (it has no sm:right-auto override below 640px) — float above it
-    // (matching its own max-h-[65vh]) instead of overlapping when it's open.
     <div className={`absolute right-3 z-20 ${selectedPoiId ? "bottom-[calc(65vh+0.75rem)]" : "bottom-3"}`}>
       <button
         type="button"

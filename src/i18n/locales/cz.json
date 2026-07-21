@@ -6,6 +6,10 @@
     "playful": "Hravá",
     "nature": "Příroda"
   },
+  "mapProvider": {
+    "google": "Google",
+    "maplibre": "TomTom"
+  },
   "categoryFilter": {
     "all": "Vše"
   },
@@ -20,11 +24,13 @@
     "timeoutMessage": "Mapa se načítá déle než obvykle — nejspíš pomalé připojení. Zkuste to znovu.",
     "retry": "Zkusit znovu"
   },
+  "mapLoading": "Načítání mapy…",
   "searchBox": {
     "placeholder": "Hledat místo…"
   },
   "mapLayers": {
     "title": "Vrstvy mapy",
+    "provider": "Poskytovatel mapy",
     "style": "Styl mapy",
     "language": "Jazyk",
     "mapView": "Zobrazení mapy",

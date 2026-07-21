@@ -3,13 +3,16 @@ import { MapView } from "./components/MapView";
 import { CategoryFilter } from "./components/CategoryFilter";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { StyleSwitcher } from "./components/StyleSwitcher";
+import { MapProviderSwitcher } from "./components/MapProviderSwitcher";
 import { POIDetailPanel } from "./components/POIDetailPanel";
 import { MapLayerSettings } from "./components/MapLayerSettings";
 import { useIsMobile } from "./hooks/useIsMobile";
+import { useIsCompact } from "./hooks/useIsCompact";
 
 export default function App() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const isCompact = useIsCompact();
 
   return (
     <div className="flex h-screen w-screen flex-col bg-brand-paper">
@@ -21,6 +24,7 @@ export default function App() {
         <div className="flex items-center gap-2 sm:gap-3">
           {!isMobile && (
             <div className="flex items-center gap-2 sm:gap-3">
+              {!isCompact && <MapProviderSwitcher />}
               <StyleSwitcher />
               <LanguageSwitcher />
             </div>
@@ -37,9 +41,6 @@ export default function App() {
   );
 }
 
-// Replaces the 🧭 emoji with a badge matching the marker icon system: a
-// circle badge + a two-tone compass needle, same drop-shadow convention as
-// the map pins in src/assets/markers/.
 function CompassLogo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true">

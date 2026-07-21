@@ -158,3 +158,104 @@ Captured for later — none of this is designed or scoped yet, just named as a d
 - **Observability** — analytics/monitoring/logging once there's a backend and real user actions to observe (not meaningful for the current static MVP beyond basic Cloudflare Pages request logs).
 
 Architecture implication when this gets picked up: needs an auth provider (e.g. Clerk/Supabase Auth/Firebase Auth, or Cloudflare's own stack) and a real backend + database (e.g. Cloudflare Workers + D1, or Supabase) — a genuine scope and cost decision (see the earlier "$0 quota cap" constraint in Phase 0), not a Cloudflare Pages static-only extension.
+
+---
+
+## 8. Map provider abstraction — TomTom/MapLibre/OSM research (Phase 8, v1 built on `feature/maplibre-tomtom-provider`)
+
+**Goal (revised):** primarily a **learning project** — an optional, user-visible switcher to pick/change the map provider/base layer (Google vs. TomTom-via-MapLibre vs. OpenStreetMap-data-via-MapLibre), to understand how each actually works under the hood. Resilience (auto-failover away from a Google quota failure) is a secondary, possible benefit, not the primary driver. This section is **research only** — no implementation decision made yet, per this playbook's Research Before Implementing convention.
+
+### Why this is worth considering
+
+- Understanding how three different mapping stacks handle the same problem (markers, clustering, styling, tiles) is genuinely educational — this is the actual point, not just resilience.
+- As a side effect, a second/third independent provider also turns "map sometimes doesn't work" (today's hard $0 Google quota cap) into "map always works, sometimes on a different provider."
+- MapLibre is fully open source — fits this project's and the wider playbook's "tech-agnostic, no vendor lock-in" story.
+
+### Provider comparison (researched — see sources)
+
+| | Google Maps (current) | TomTom (MapLibre-based) | MapTiler / Stadia Maps (MapLibre, OSM data) |
+|---|---|---|---|
+| Free tier | Hard $0 quota cap set manually — low headroom, the actual cause of today's fallback UX | 50,000 tile requests/day + 2,500 non-tile requests/day (pricing revised July 2026 — re-check before committing) | MapTiler: 100k free tile loads. Stadia: free tier for **non-commercial use only** — needs a careful read of what "non-commercial" covers for a portfolio site that supports a freelance pitch |
+| Styling | Proprietary Google style-JSON array — today's `playful.json`/`nature.json` are hand-authored in this format | **MapLibre Style Spec** — TomTom's own JS SDK is built directly on MapLibre GL JS, so this is a first-class fit, and styles can be built visually in TomTom's Map Maker instead of hand-written JSON | Same MapLibre Style Spec |
+| Clustering | `@googlemaps/markerclusterer` + imperative `google.maps.Marker` objects (today's approach, incl. the custom pie-chart `Renderer` in `MarkerLayer.tsx`) | Native GeoJSON-source clustering (`cluster: true`, GPU-rendered) for the common case; **HTML markers** for a fully custom cluster render (needed to keep the pie-chart look) | Same MapLibre approach |
+| Data | Google's own road/POI/imagery data | TomTom's own data | OpenStreetMap community data — coverage/detail varies by region, worth spot-checking CZ/SK rural areas specifically before relying on it |
+
+**"OpenStreetMap" specifically — important constraint found:** raw tiles directly from `tile.openstreetmap.org` are **not usable for this project**. The OSMF Tile Usage Policy explicitly forbids "heavy use (e.g. distributing an app that uses tiles from openstreetmap.org)" without prior written permission from their Operations Working Group, and forbids any offline/bulk caching outright — it's a best-effort, donation-funded server not meant for embedding in a deployed public app. The correct way to use OSM data in production is through a compliant host that redistributes it — **MapTiler** (100k free tile loads, no "non-commercial only" restriction) is the practical "OpenStreetMap" option here, not the raw tile server.
+
+### Key finding: markers/clustering can't be literally shared code — but the "brain" can
+
+The original assumption ("clusters and markers could be shared") is only partly true. MapLibre's rendering model is fundamentally different from Google's: Google uses imperative `Marker` objects plus a separate clusterer library; MapLibre clusters via a GeoJSON source property or via HTML DOM markers when custom rendering (like the pie chart) is needed — there's no shared marker object type to reuse directly. This holds across all three providers being considered, since TomTom and MapTiler are both plain MapLibre underneath — so a "MapLibre adapter" built once should work for both, only the tile/style source URL and API key differ between them.
+
+What **is** genuinely shareable, provider-agnostically:
+- POI filtering logic (`visiblePois` computation in `MarkerLayer.tsx`)
+- The pie-chart icon math itself (`src/lib/clusterPieIcon.ts` — pure SVG/canvas generation, no Google types involved)
+- Category color/order config (`categories.json`-derived lookups)
+
+What needs a **separate implementation per rendering engine** (i.e. one Google implementation, one MapLibre implementation shared by both TomTom and MapTiler):
+- The actual marker/cluster rendering glue (`google.maps.Marker` + `MarkerClusterer` vs MapLibre GeoJSON source + HTML cluster markers)
+- Load-failure detection (`gm_authFailure` + `tilesloaded` watchdog is Google-specific; MapLibre has its own `error`/`load` events — needs its own research pass before implementing)
+- Map style format entirely (Google style-JSON vs MapLibre Style Spec — not automatically convertible; style parity per provider is real design work, not a mechanical port)
+
+### Architecture options considered
+
+1. **Full provider-abstraction interface** — a `MapProvider` interface with a Google adapter and one shared MapLibre adapter (parameterized by tile/style source + key for TomTom vs. MapTiler). Most upfront work, but genuinely justified now that there are **three** providers to switch between, not two — and since the whole point is learning how each stack works, a clean interface makes the comparison legible instead of three copy-pasted components drifting apart.
+2. **Pragmatic component swap** — `MapView` branches per provider, each with its own largely-duplicated shell (bounds, zoom, style-switch wiring). Less upfront work, but with 3 providers instead of 2 the duplication cost rises and undercuts the learning goal (harder to compare providers when the surrounding code isn't parallel).
+3. **MapLibre-only migration (drop Google entirely)** — not the ask here; the ask is explicitly an optional switcher across multiple providers, not a replacement.
+
+**Recommendation (revised):** Option 1 now fits better than the earlier Option 2 recommendation — three providers plus an explicit learning goal justifies the interface's upfront cost. Concretely: one `MapProvider` interface, a `GoogleMapProvider` adapter (today's code, refactored behind the interface), and **one** `MapLibreProvider` adapter reused for both TomTom and MapTiler by passing in a different style/tile config — not three separate adapters.
+
+### What would need to change (file-level, current names)
+
+- `MapView.tsx` — branch on provider (manual toggle and/or automatic failover on `gm_authFailure`/timeout) instead of always rendering the Google subtree
+- `MapView.tsx` — becomes a thin switch over the active `MapProvider` (store-driven), instead of always rendering the Google subtree directly
+- New shared `MapLibreProvider` (naming TBD) — one MapLibre GL JS implementation, configured via a small per-source object (style/tile URL + API key) so the same component serves both TomTom and MapTiler — not two near-duplicate components. Owns its own bounds/zoom/style-switch handling and its own load-failure detection (separate research needed — MapLibre's failure signals aren't the same as Google's `gm_authFailure`/`tilesloaded`)
+- New `MarkerLayerMapLibre.tsx` — GeoJSON source of `ALL_POIS`, clustering via MapLibre's native support or HTML markers (to keep the pie-chart look), reusing `clusterPieIcon.ts`'s math and the category config, but with new render glue — shared by both TomTom and MapTiler since it's provider-source-agnostic
+- New MapLibre style JSON for TomTom, and separately for MapTiler, for parity with `playful.json`/`nature.json` — build visually via TomTom's Map Maker / MapTiler's style editor rather than hand-writing MapLibre Style Spec JSON from scratch; this is real design work per source, not a mechanical port, and is the part most likely to want to be simplified for v1 (see open question 2)
+- `useAppStore.ts` — new provider-selection state (`google` | `tomtom` | `maptiler`, or similar)
+- A provider switcher UI — given the learning goal, this should probably be genuinely visible (not tucked away), e.g. a small labeled control near the existing `MapLayerSettings`/`StyleSwitcher` area
+- `.env.local` / Cloudflare Pages build vars — new `VITE_TOMTOM_API_KEY` and `VITE_MAPTILER_API_KEY`
+- `AGENTS.md` — new stack-decision entry once an approach is actually chosen
+
+### Open questions to settle before this becomes an implementation task
+
+1. Manual switcher only (matches the stated goal), or also wire up auto-failover on Google quota failure as a bonus once the MapLibre adapter exists anyway?
+2. Does each MapLibre-based provider need full `playful`/`nature` visual parity for v1, or is one acceptable-looking default style per provider enough to start (only needs to look intentional, not pixel-match Google)?
+3. TomTom's exact commercial-use terms for this specific use case (portfolio site, supports a freelance pitch, not direct map-view sales) — re-verify against TomTom's current terms before committing, not just the headline free-tier numbers above. MapTiler's free tier has no "non-commercial only" language in what was found, but re-verify directly too.
+4. Any interest in a 4th provider later (e.g. Stadia Maps) once the shared `MapLibreProvider` exists — if so, that's an argument for keeping the per-source config genuinely generic from the start rather than TomTom/MapTiler-specific.
+
+### Sources (researched during this pass — re-verify before implementing, pricing/terms change)
+
+- [TomTom Pricing](https://docs.tomtom.com/pricing)
+- [TomTom Maps SDK for JavaScript — Overview](https://docs.tomtom.com/maps-sdk-js/introduction/overview)
+- [MapLibre GL JS — Optimising Performance for Large GeoJSON Datasets](https://maplibre.org/maplibre-gl-js/docs/guides/large-data/)
+- [Clustering with MapLibre GL JS — Stadia Maps Docs](https://docs.stadiamaps.com/tutorials/clustering-styling-points-with-maplibre/)
+- [Display HTML clusters with custom properties — MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/examples/display-html-clusters-with-custom-properties/)
+- [OSMF Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) — why raw `tile.openstreetmap.org` isn't usable here
+- [OpenMapTiles — Ready to use API via MapTiler Cloud](https://openmaptiles.org/docs/host/maptiler-cloud/)
+
+**Next step:** not an implementation task yet. Settle the open questions above, then run `/create-task` for a scoped v1 — recommend starting with the shared `MapLibreProvider` built against **one** source first (TomTom, since it has the clearest free-tier headroom), prove the interface works, then add MapTiler as the second source through the same adapter before touching styling parity or auto-failover.
+
+### v1 implementation notes (TomTom-only, this pass)
+
+Built directly on the explicit go-ahead ("Maplibre + tomtom najprv... jednu cistu Google map implementaciu... Vedla toho MapLibre implementaciu s moznymi providermi") — a manual switcher only (open question 1: yes, manual-only, no auto-failover yet), one default TomTom style with no attempt at `playful`/`nature` parity (open question 2: settled — TomTom gets its own look, doesn't need to match Google).
+
+- `GoogleMapView.tsx` — the old `MapView.tsx`, moved verbatim, unmodified.
+- `MapView.tsx` — now a thin switch on `useAppStore().mapProvider` (`"google" | "maplibre"`, default `"google"`, persisted to `localStorage`).
+- `MapLibreMapView.tsx` / `MarkerLayerMapLibre.tsx` / `ZoomControlMapLibre.tsx` — the MapLibre-side implementation, structurally parallel to the Google files but not sharing code with them (per the "separate render glue" finding above).
+- `src/lib/mapLibreProviders.ts` — the provider registry the "one shared adapter" recommendation above pointed at; today it has exactly one entry (`tomtom`), keyed by `VITE_TOMTOM_MAPS_API_KEY`. Adding MapTiler later is meant to be a second entry here, not a new component.
+- TomTom style source: not their newer `@tomtom-org/maps-sdk` (proprietary wrapper, TomTom-specific, doesn't fit a shared multi-provider adapter) — instead their plain Merged Style JSON endpoint (`https://api.tomtom.com/style/1/style/*?key=...&map=basic_main`), which is genuine MapLibre Style Spec and needs nothing but `maplibre-gl` itself. Maps SDK for Web v6 is deprecated (Feb 2026 CDN withdrawal) and was deliberately avoided.
+- `src/lib/mapConstants.ts` — added `SLOVAKIA_BOUNDS_MAPLIBRE`, derived from the existing `SLOVAKIA_BOUNDS` object rather than re-entering the four numbers.
+- **Not yet done:** MapTiler/OSM as a second MapLibre source (open questions 3–4 still open), auto-failover, and any TomTom style customization beyond the default `basic_main`.
+- **Verification gap:** this was written in a sandbox with no access to the npm registry and a `node_modules` tree that doesn't match its own architecture (native `rolldown` bindings failed even for the pre-existing Vitest suite) — none of this could be `npm install`ed, type-checked, or run. Treat it as unverified until `npm install && npm run build && npm run test` pass locally, plus a manual pan/zoom/filter/cluster-click pass in the browser with a real `VITE_TOMTOM_MAPS_API_KEY`.
+
+### Style overrides, clustering, and zoom parity (post-v1 hardening)
+
+TomTom's `basic_main` style ships 300+ granular layers with no `featureType` wildcarding like Google's `styles.json` (no way to recolor "all roads" in one rule). `src/lib/mapLibreStyleOverrides.ts` classifies each layer at runtime by keyword match on its id/source-layer (water, park, terrain, building, road tiers, admin boundary, labels), then repaints via `setPaintProperty`/`setLayoutProperty`. This has to re-run on every `style.load` since it's a live override, not a persisted style document — `MapLibreMapView` applies it in a `style.load` handler (before first paint) to avoid a flash of TomTom's default green/tan colors, and `StyleOverrideMapLibre` re-applies it reactively on `mapStyle`/toggle changes.
+
+Country vs. region/county/district admin boundaries can't be told apart by id or keyword — TomTom's style JSON has no consistent naming for this. Instead, `estimateBaseLineWidth()` reads each layer's *original* `line-width` (a plain number, a legacy stops object, or a MapLibre `interpolate` expression — for `interpolate`, the width is array index 4, not index 3, which is the zoom breakpoint) and treats anything at or above `ADMIN_COUNTRY_WIDTH_SIGNAL` (1.2) as country-level (solid line), everything else as region-level (dotted, matching Google's native sub-country rendering).
+
+Google's `@googlemaps/markerclusterer` (`SuperClusterAlgorithm`) rounds fractional zoom (`Math.round`) when picking a cluster tier; MapLibre's own tile-based clustering floors it (`Math.floor`), so the same on-screen zoom could group POIs differently between providers. `MarkerLayerMapLibre.tsx` now runs its own directly-managed `supercluster` instance (the same library Google's clusterer uses internally) with `Math.round(map.getZoom())`, reproducing Google's algorithm exactly instead of relying on MapLibre's native GeoJSON clustering. Both providers share `MARKER_CLUSTER_RADIUS`/`MARKER_CLUSTER_MAX_ZOOM` (`mapConstants.ts`); Google's copies (`GOOGLE_MARKER_CLUSTER_*`) use a larger radius since its renderer read as sparser at the same on-screen distance otherwise.
+
+Google's JS API and MapLibre don't share a zoom scale 1:1 for the same visual scale — `GOOGLE_MIN_ZOOM`/`GOOGLE_MAX_ZOOM` are Google's own empirically-tuned copies of `MIN_ZOOM`/`MAX_ZOOM`, not shared constants; the exact offset (`MIN_ZOOM + 1`) was settled by live visual testing, not derived from a formula. `isFractionalZoomEnabled` is also on for Google so its `fitBounds()` framing matches MapLibre's continuous zoom instead of snapping to whole integers.
+
+`src/lib/mapLibreHillshade.ts` adds real shaded-relief terrain to the TomTom view (Google gets this for free via `mapTypeId="terrain"`). TomTom's "Hillshade Tile" endpoint returns raw elevation data using the same encoding as Mapbox's Terrain-RGB format (`height = -10000 + (R*256*256 + G*256 + B) * 0.1`), so MapLibre's built-in `raster-dem` source (`encoding: "mapbox"`) decodes it natively; the layer is inserted just before the first water-looking layer so shading sits above flat land fills but below water/roads/labels.

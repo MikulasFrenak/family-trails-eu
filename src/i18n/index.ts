@@ -18,8 +18,6 @@ void i18next
     supportedLngs: ["en", "cz", "sk"],
     interpolation: { escapeValue: false },
     detection: {
-      // Browsers report Czech as the ISO code "cs", but our resource/store
-      // key is "cz" — remap so browser auto-detection actually finds it.
       convertDetectedLanguage: (lng) => (lng.toLowerCase().startsWith("cs") ? "cz" : lng),
     },
   });

@@ -4,7 +4,7 @@
     "category": "castle",
     "country": "SK",
     "region": "Trenčín Region",
-    "coordinates": { "lat": 48.7808, "lng": 18.5817 },
+    "coordinates": { "lat": 48.7802, "lng": 18.5775 },
     "name": { "en": "Bojnice Castle", "cz": "Zámek Bojnice", "sk": "Zámok Bojnice" },
     "description": {
       "en": "A fairy-tale castle with turrets and towers, home to the yearly Ghosts and Spooks festival.",
@@ -191,7 +191,7 @@
   },
   {
     "id": "sk-orava-village-museum",
-    "category": "historical-building",
+    "category": "museum",
     "country": "SK",
     "region": "Žilina Region",
     "coordinates": { "lat": 49.2611, "lng": 19.6611 },
@@ -586,5 +586,81 @@
     },
     "tags": ["outdoor", "free-access", "uphill-walk", "not-stroller-friendly"],
     "externalUrl": "https://www.bradlo.sk/"
+  },
+  {
+    "id": "sk-farmapark-lubina",
+    "category": "family-park",
+    "country": "SK",
+    "region": "Trenčín Region",
+    "coordinates": { "lat": 48.8201, "lng": 17.7045 },
+    "name": { "en": "FarmaPARK Lubina", "cz": "FarmaPARK Lubina", "sk": "FarmaPARK Lubina" },
+    "description": {
+      "en": "A contact farm in the Biele Karpaty foothills where kids can pet and feed miniature goats, sheep, ponies, and other farm animals up close.",
+      "cz": "Kontaktní farma v podhůří Bílých Karpat, kde si děti mohou pohladit a nakrmit miniaturní kozy, ovce, poníky a další hospodářská zvířata.",
+      "sk": "Kontaktná farma v podhorí Bielych Karpát, kde si deti môžu pohladiť a nakŕmiť miniatúrne kozy, ovce, poníky a ďalšie hospodárske zvieratá."
+    },
+    "kidFriendly": {
+      "minAge": 0,
+      "notes": { "en": "Purpose-built for young children — walk-through pens, bottle-feeding, pony rides, a water playground, and a forest playground on site." }
+    },
+    "tags": ["outdoor", "playground-nearby", "stroller-friendly"],
+    "externalUrl": "https://www.farmapark.sk"
+  },
+  {
+    "id": "sk-skalica-rotunda",
+    "category": "historical-building",
+    "country": "SK",
+    "region": "Trnava Region",
+    "coordinates": { "lat": 48.8485, "lng": 17.2254 },
+    "name": { "en": "Rotunda of St George, Skalica", "cz": "Rotunda svatého Jiří, Skalica", "sk": "Rotunda svätého Juraja, Skalica" },
+    "description": {
+      "en": "One of the oldest standing buildings in Slovakia, a Romanesque rotunda dating back to the Great Moravian era on a quiet hill above Skalica's vineyards.",
+      "cz": "Jedna z nejstarších dochovaných staveb na Slovensku, románská rotunda pocházející z doby Velké Moravy na tichém kopci nad vinicemi Skalice.",
+      "sk": "Jedna z najstarších zachovaných stavieb na Slovensku, románska rotunda pochádzajúca z čias Veľkej Moravy na tichom kopci nad skalickými vinicami."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "Small site with a short easy walk from the road; the interior is viewed on a brief guided visit, so check opening times ahead." }
+    },
+    "tags": ["outdoor", "guided-tour"],
+    "externalUrl": "https://www.zahorskemuzeum.sk/rotunda-svateho-juraja/"
+  },
+  {
+    "id": "sk-smolenice-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Trnava Region",
+    "coordinates": { "lat": 48.5134, "lng": 17.4319 },
+    "name": { "en": "Smolenice Castle", "cz": "Zámek Smolenice", "sk": "Zámok Smolenice" },
+    "description": {
+      "en": "A fairy-tale neo-Gothic chateau on a wooded hillside in the Malé Karpaty, surrounded by an English park with a pond, near the entrance to Driny Cave.",
+      "cz": "Pohádkový novogotický zámek na zalesněném svahu Malých Karpat, obklopený anglickým parkem s rybníkem, nedaleko vstupu do jeskyně Driny.",
+      "sk": "Rozprávkový novogotický zámok na zalesnenom svahu Malých Karpát, obklopený anglickým parkom s rybníkom, neďaleko vstupu do jaskyne Driny."
+    },
+    "kidFriendly": {
+      "minAge": 3,
+      "notes": { "en": "Castle interior only opens in July–August; the English garden and park are free and open year-round, great for a picnic or bike ride." }
+    },
+    "tags": ["outdoor", "guided-tour", "forest"],
+    "externalUrl": "https://www.hrady-zamky.sk/en/smolenice/"
+  },
+  {
+    "id": "sk-cerveny-kamen-castle",
+    "category": "castle",
+    "country": "SK",
+    "region": "Bratislava Region",
+    "coordinates": { "lat": 48.3917, "lng": 17.3353 },
+    "name": { "en": "Červený Kameň Castle", "cz": "Hrad Červený Kameň", "sk": "Hrad Červený Kameň" },
+    "description": {
+      "en": "A sturdy Renaissance fortress-castle in the Little Carpathians near Častá, with vast grounds, historic armouries, and one of Central Europe's largest Renaissance cellars.",
+      "cz": "Mohutný renesanční pevnostní hrad v Malých Karpatech u Časté, s rozlehlými pozemky, historickými zbrojnicemi a jedním z největších renesančních sklepení ve střední Evropě.",
+      "sk": "Mohutný renesančný pevnostný hrad v Malých Karpatoch pri Častej, s rozľahlými pozemkami, historickými zbrojnicami a jedným z najväčších renesančných pivníc v strednej Európe."
+    },
+    "kidFriendly": {
+      "minAge": 4,
+      "notes": { "en": "Spacious grounds for a picnic, engaging guided tours past weapons and armour, and occasional kids-focused tours about castle life; free entry for the youngest visitors." }
+    },
+    "tags": ["outdoor", "guided-tour", "indoor"],
+    "externalUrl": "https://www.hrady-zamky.sk/en/cerveny-kamen/"
   }
 ]

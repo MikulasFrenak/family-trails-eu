@@ -15,6 +15,10 @@ describe("useAppStore", () => {
     expect(state.language).toMatch(/^(en|cz|sk)$/);
   });
 
+  it("defaults to the google map provider", () => {
+    expect(useAppStore.getState().mapProvider).toBe("google");
+  });
+
   describe("toggleCategory", () => {
     it("adds a category that isn't active yet", () => {
       useAppStore.getState().toggleCategory("zoo");
@@ -50,6 +54,13 @@ describe("useAppStore", () => {
     it("setMapTypeId updates mapTypeId only", () => {
       useAppStore.getState().setMapTypeId("satellite");
       expect(useAppStore.getState().mapTypeId).toBe("satellite");
+    });
+
+    it("setMapProvider updates mapProvider only", () => {
+      useAppStore.getState().setMapProvider("maplibre");
+      const state = useAppStore.getState();
+      expect(state.mapProvider).toBe("maplibre");
+      expect(state.mapStyle).toBe("playful"); // untouched
     });
 
     it("selectPoi sets and clears the selected POI id", () => {

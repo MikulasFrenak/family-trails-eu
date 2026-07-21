@@ -6,6 +6,10 @@
     "playful": "Playful",
     "nature": "Nature"
   },
+  "mapProvider": {
+    "google": "Google",
+    "maplibre": "TomTom"
+  },
   "categoryFilter": {
     "all": "All"
   },
@@ -20,11 +24,13 @@
     "timeoutMessage": "The map is taking longer than usual — probably a slow connection. Give it another try.",
     "retry": "Try again"
   },
+  "mapLoading": "Loading map…",
   "searchBox": {
     "placeholder": "Search a place…"
   },
   "mapLayers": {
     "title": "Map layers",
+    "provider": "Map provider",
     "style": "Map style",
     "language": "Language",
     "mapView": "Map view",

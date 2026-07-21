@@ -302,5 +302,43 @@
     },
     "tags": ["outdoor", "stroller-friendly", "playground-nearby"],
     "externalUrl": "https://www.zoozlin.eu"
+  },
+  {
+    "id": "cz-mikulov-castle",
+    "category": "castle",
+    "country": "CZ",
+    "region": "South Moravia",
+    "coordinates": { "lat": 48.8065, "lng": 16.6363 },
+    "name": { "en": "Mikulov Castle", "cz": "Zámek Mikulov", "sk": "Zámok Mikulov" },
+    "description": {
+      "en": "A hilltop chateau overlooking the town and Pálava hills, with a giant historic wine barrel hidden in its cellars.",
+      "cz": "Zámek na kopci s výhledem na město a Pálavské vrchy, ve sklepení ukrývá obří historický sud na víno.",
+      "sk": "Zámok na kopci s výhľadom na mesto a Pálavské vrchy, v pivniciach ukrýva obrovský historický sud na víno."
+    },
+    "kidFriendly": {
+      "minAge": 6,
+      "notes": { "en": "Interactive exhibits and the giant wine barrel are a hit with kids; castle garden is good for a picnic." }
+    },
+    "tags": ["guided-tour", "indoor"],
+    "externalUrl": "https://www.zamek-mikulov.cz"
+  },
+  {
+    "id": "cz-mikulov-svaty-kopecek",
+    "category": "historical-building",
+    "country": "CZ",
+    "region": "South Moravia",
+    "coordinates": { "lat": 48.8083, "lng": 16.6483 },
+    "name": { "en": "Svatý kopeček (Holy Hill), Mikulov", "cz": "Svatý kopeček, Mikulov", "sk": "Svätý kopček, Mikulov" },
+    "description": {
+      "en": "A limestone hill above Mikulov topped by the Chapel of St Sebastian, reached along the oldest Way of the Cross in the Czech lands, with panoramic views over the town and vineyards.",
+      "cz": "Vápencový kopec nad Mikulovem s kaplí svatého Šebestiána na vrcholu, k níž vede nejstarší křížová cesta v českých zemích, s výhledem na město a vinice.",
+      "sk": "Vápencový kopec nad Mikulovom s kaplnkou svätého Šebastiána na vrchole, ku ktorej vedie najstaršia krížová cesta v českých krajinách, s výhľadom na mesto a vinice."
+    },
+    "kidFriendly": {
+      "minAge": 5,
+      "notes": { "en": "About 40 minutes uphill on a marked path with Stations of the Cross; steep in places and not stroller-friendly, but manageable for kids used to walking." }
+    },
+    "tags": ["outdoor", "hiking", "uphill-walk", "not-stroller-friendly"],
+    "externalUrl": "https://www.mikulov.cz/en/tourist/services/tourist-destinations/a-natural-attraction/svaty-kopecek-holy-hill"
   }
 ]
