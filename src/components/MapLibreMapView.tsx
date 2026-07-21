@@ -9,6 +9,8 @@ import { StyleOverrideMapLibre } from "./StyleOverrideMapLibre";
 import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS_MAPLIBRE, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 import { MAPLIBRE_PROVIDERS, DEFAULT_MAPLIBRE_PROVIDER_ID } from "../lib/mapLibreProviders";
 import { ensureMapLibreHillshade } from "../lib/mapLibreHillshade";
+import { applyMapLibreLayerVisibility, applyMapLibreStyleOverrides } from "../lib/mapLibreStyleOverrides";
+import { useAppStore } from "../store/useAppStore";
 
 // Generous on purpose, same reasoning as GoogleMapView's LOAD_TIMEOUT_MS —
 // kept as a separate constant (not imported from there) since the two map
@@ -61,6 +63,29 @@ export function MapLibreMapView() {
       fitBoundsOptions: { padding: MAP_BOUNDS_PADDING },
       minZoom: MIN_ZOOM,
       maxZoom: MAX_ZOOM,
+    });
+
+    // Apply our color/visibility overrides as soon as the raw style is
+    // parsed ("style.load"), not after StyleOverrideMapLibre mounts via
+    // React state on "load". "load" only fires once tiles have actually
+    // rendered — by then TomTom's stock basic_main colors (a plain green/tan
+    // street style) have already painted at least one visible frame,
+    // producing a flash of the wrong style whenever this view mounts (e.g.
+    // switching Google -> TomTom). "style.load" fires right after the style
+    // JSON + sprite/glyphs are ready but before tile data has arrived, so
+    // setting paint/layout properties here lands before the first real
+    // paint instead of after it. The reactive effects in
+    // StyleOverrideMapLibre still own re-applying on later mapStyle/toggle
+    // changes — this is purely about winning the initial race.
+    instance.on("style.load", () => {
+      const state = useAppStore.getState();
+      applyMapLibreStyleOverrides(instance, state.mapStyle);
+      applyMapLibreLayerVisibility(instance, {
+        showRoads: state.showRoads,
+        showPlaceLabels: state.showPlaceLabels,
+        showMountainLabels: state.showMountainLabels,
+        showWaterLabels: state.showWaterLabels,
+      });
     });
 
     instance.on("load", () => {
