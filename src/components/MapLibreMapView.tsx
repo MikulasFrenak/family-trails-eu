@@ -8,6 +8,7 @@ import { FilterControl } from "./FilterControl";
 import { StyleOverrideMapLibre } from "./StyleOverrideMapLibre";
 import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS_MAPLIBRE, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 import { MAPLIBRE_PROVIDERS, DEFAULT_MAPLIBRE_PROVIDER_ID } from "../lib/mapLibreProviders";
+import { ensureMapLibreHillshade } from "../lib/mapLibreHillshade";
 
 // Generous on purpose, same reasoning as GoogleMapView's LOAD_TIMEOUT_MS —
 // kept as a separate constant (not imported from there) since the two map
@@ -65,6 +66,11 @@ export function MapLibreMapView() {
     instance.on("load", () => {
       loaded = true;
       disarm();
+      // Real shaded-relief terrain, same request that motivated it: Google's
+      // "terrain" mapTypeId gives it hillshade texture, MapLibre/TomTom had
+      // none — see mapLibreHillshade.ts. Added once per map instance
+      // (guarded internally), independent of mapStyle (playful/nature).
+      ensureMapLibreHillshade(instance, apiKey);
       if (!cancelled) setMap(instance);
     });
     // MapLibre's "error" event fires for all sorts of non-fatal things too
