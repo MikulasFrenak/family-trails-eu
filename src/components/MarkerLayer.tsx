@@ -84,13 +84,10 @@ export function MarkerLayer() {
     };
 
     // GOOGLE_MARKER_CLUSTER_RADIUS/GOOGLE_MARKER_CLUSTER_MAX_ZOOM (see
-    // mapConstants.ts) are TomTom's MARKER_CLUSTER_RADIUS/MARKER_CLUSTER_MAX_ZOOM
-    // with GOOGLE_ZOOM_OFFSET-aware adjustments applied — Google's own zoom
-    // numbering runs about 2 higher than MapLibre's for the same visual
-    // scale (256px vs 512px tile pyramids), so a literal shared number
-    // doesn't actually group/dissolve at the same real-world distance on
-    // both providers even though it's the same npm `supercluster` library
-    // underneath both.
+    // mapConstants.ts) are Google's own independently-tuned copies of
+    // TomTom's MARKER_CLUSTER_RADIUS/MARKER_CLUSTER_MAX_ZOOM — radius bumped
+    // up a bit per feedback that Google's clustering needed to feel a
+    // little more aggressive for equivalent behavior between providers.
     const clusterer = new MarkerClusterer({
       map,
       markers,

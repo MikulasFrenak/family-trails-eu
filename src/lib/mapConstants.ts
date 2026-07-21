@@ -1,28 +1,29 @@
 // Keeps zoom in the useful range for this app: never out to a whole-world
 // view, never in past normal street-level detail. These two are the
 // MapLibre/TomTom-native numbers — MapView/ZoomControlMapLibre use them
-// directly. Google needs its own offset copies below (GOOGLE_MIN_ZOOM/
+// directly. Google needs its own copies below (GOOGLE_MIN_ZOOM/
 // GOOGLE_MAX_ZOOM) rather than these raw values — see the comment there.
 export const MIN_ZOOM = 6;
 export const MAX_ZOOM = 18;
 
 // Google Maps' JS API and MapLibre/TomTom don't count zoom the same way for
-// the same on-screen scale: Google's tile pyramid uses 256px tiles, while
-// MapLibre GL (and TomTom's vector style, built for it) uses 512px tiles —
-// real-world reports put the offset at roughly 2 (e.g. "Mapbox GL zoom 15
-// looks the same as Google Maps zoom 17" — github.com/mapbox/
-// mapbox-gl-native/issues/9417), i.e. Google needs the *higher* number for
-// the same view. First tried as exactly 2 (matching that report literally),
-// but a direct side-by-side screenshot comparison at that value still
-// showed Google noticeably tighter/more zoomed-in than TomTom at its own
-// floor (a single mountain range vs. TomTom's Dresden-to-Zagreb continental
-// view at their respective MIN_ZOOM) — bumped to 4 per that comparison and
-// the follow-up feedback ("increased by 1-2 maybe... MIN"). Still an
-// empirically-tuned number rather than a precisely derived one; nudge
-// further if either end still doesn't visually match.
-export const GOOGLE_ZOOM_OFFSET = 4;
-export const GOOGLE_MIN_ZOOM = MIN_ZOOM + GOOGLE_ZOOM_OFFSET;
-export const GOOGLE_MAX_ZOOM = MAX_ZOOM + GOOGLE_ZOOM_OFFSET;
+// the same on-screen scale. Two rounds of trying to derive/tune a shared
+// "GOOGLE_ZOOM_OFFSET" added *to* MIN_ZOOM/MAX_ZOOM (based on published
+// reports that Google's number should run higher than Mapbox/MapLibre's for
+// the same view) went the wrong way in practice: raising GOOGLE_MIN_ZOOM
+// above MIN_ZOOM made Google's floor (10) end up *higher* than the zoom
+// defaultBounds/fitBounds naturally computes to fit all of Slovakia — the
+// SDK clamps the initial view up to minZoom when the fitted zoom is lower
+// than it, which broke the default centered view entirely (it started
+// zoomed in far past the whole country). Direct feedback confirmed the
+// floor needed to go the other way — *lower* than MIN_ZOOM, not higher — to
+// let Google zoom out at least as far as TomTom, and to stay safely below
+// whatever zoom fitBounds picks for SLOVAKIA_BOUNDS so it can never clamp
+// the default view again. No more derived "offset" model for either bound —
+// both are independent, empirically-set numbers now; adjust either directly
+// based on what's actually observed rather than a shared formula.
+export const GOOGLE_MIN_ZOOM = 3;
+export const GOOGLE_MAX_ZOOM = MAX_ZOOM;
 
 // Slovakia's approximate geographic extent — used to fit the whole country
 // into view (best-fit zoom computed by the Maps SDK, not a fixed zoom
@@ -51,33 +52,20 @@ export const SLOVAKIA_BOUNDS_MAPLIBRE: [number, number, number, number] = [
 
 // Marker-cluster grouping radius, in pixels — the TomTom/MapLibre side
 // (MarkerLayerMapLibre's own directly-managed `supercluster` instance).
-// Previously this was also shared as a literal number with Google, on the
-// assumption that the same `supercluster` library underneath meant the same
-// number produced the same grouping — true for the *algorithm*, but not
-// once GOOGLE_ZOOM_OFFSET (above) is accounted for: Google's clusterer
-// evaluates this radius against Google's own (offset) zoom number, so a
-// shared literal radius doesn't actually group the same real-world area on
-// both sides. See GOOGLE_MARKER_CLUSTER_RADIUS below for Google's own copy.
 export const MARKER_CLUSTER_RADIUS = 55;
 
 // Zoom level at which clusters fully dissolve into individual pins, for the
 // TomTom/MapLibre side. See GOOGLE_MARKER_CLUSTER_MAX_ZOOM below for
-// Google's offset copy.
+// Google's own copy.
 export const MARKER_CLUSTER_MAX_ZOOM = MAX_ZOOM - 2;
 
-// Google-specific copies, both compensating for GOOGLE_ZOOM_OFFSET: Google's
-// SuperClusterAlgorithm evaluates radius/maxZoom against Google's own
-// Math.round(map.getZoom()), which — per GOOGLE_ZOOM_OFFSET above — runs
-// higher than the equivalent MapLibre zoom for the same view. Fed into the
-// same underlying supercluster math, that offset alone would already make
-// Google under-cluster relative to TomTom at the "same" view;
-// GOOGLE_MARKER_CLUSTER_MAX_ZOOM corrects the dissolve point for that
-// directly. Radius doesn't have as clean a formula (it interacts with the
-// offset multiplicatively, not additively, and there's no way to verify the
-// exact right number without live A/B testing both providers side by side),
-// so GOOGLE_MARKER_CLUSTER_RADIUS is a modest, empirically-adjustable bump
-// on top of the shared base per feedback ("Google clustering should have a
-// bigger radius, a little bit, for the same functionality") rather than a
-// derived value — nudge this one further if it still doesn't look equivalent.
-export const GOOGLE_MARKER_CLUSTER_MAX_ZOOM = MARKER_CLUSTER_MAX_ZOOM + GOOGLE_ZOOM_OFFSET;
+// Google's own copies of the two above. No longer derived from a shared
+// zoom-offset formula (see GOOGLE_MIN_ZOOM's comment — that model turned out
+// to be unreliable and got the map's own min/max zoom backwards in
+// practice), so these are independent, empirically-set numbers too.
+// GOOGLE_MARKER_CLUSTER_RADIUS is a modest bump over the TomTom side per
+// feedback that Google's clustering needed to feel a little more
+// aggressive/grouped for equivalent behavior; nudge either of these
+// directly if clustering still doesn't look equivalent between providers.
+export const GOOGLE_MARKER_CLUSTER_MAX_ZOOM = MARKER_CLUSTER_MAX_ZOOM;
 export const GOOGLE_MARKER_CLUSTER_RADIUS = MARKER_CLUSTER_RADIUS + 10;
