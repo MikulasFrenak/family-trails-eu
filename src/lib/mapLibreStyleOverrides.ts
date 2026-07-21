@@ -158,6 +158,21 @@ function classify(id: string, sourceLayer: string, layerType: string): Category 
     return "terrain";
   }
 
+  // Catch-all by layer type, not by keyword. Live testing surfaced the
+  // reason the keyword-only version above wasn't enough: recoloring "Earth
+  // Cover" turned formerly-invisible gaps in TomTom's landcover coverage
+  // (areas with no earth-cover polygon, previously blending into the
+  // near-white default) into glaring white holes, and admin-boundary lines
+  // whose ids don't contain "boundary"/"administrative" stayed at TomTom's
+  // default gray. Rather than keep guessing at more keywords one report at
+  // a time, any remaining "fill" layer gets the terrain tint (so no land
+  // area is left unstyled) and any remaining "line" layer gets the
+  // adminBoundary tint (so no border/line is left at TomTom's default
+  // gray) — better an unusual line rendering slightly lilac than another
+  // round of "there's still a gap/gray line here".
+  if (layerType === "fill") return "terrain";
+  if (layerType === "line") return "adminBoundary";
+
   return "skip";
 }
 
