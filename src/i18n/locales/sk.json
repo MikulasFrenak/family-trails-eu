@@ -24,6 +24,7 @@
     "timeoutMessage": "Mapa sa načítava dlhšie než zvyčajne — asi pomalé pripojenie. Skúste to znova.",
     "retry": "Skúsiť znova"
   },
+  "mapLoading": "Načítanie mapy…",
   "searchBox": {
     "placeholder": "Hľadať miesto…"
   },

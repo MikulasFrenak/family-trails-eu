@@ -2,6 +2,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MapLoadFallback } from "./MapLoadFallback";
+import { MapLoadingOverlay } from "./MapLoadingOverlay";
 import { MarkerLayerMapLibre } from "./MarkerLayerMapLibre";
 import { ZoomControlMapLibre } from "./ZoomControlMapLibre";
 import { FilterControl } from "./FilterControl";
@@ -132,6 +133,7 @@ export function MapLibreMapView() {
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
+      {!map && <MapLoadingOverlay />}
       {map && (
         <>
           <StyleOverrideMapLibre map={map} />

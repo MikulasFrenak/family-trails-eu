@@ -24,6 +24,7 @@
     "timeoutMessage": "The map is taking longer than usual — probably a slow connection. Give it another try.",
     "retry": "Try again"
   },
+  "mapLoading": "Loading map…",
   "searchBox": {
     "placeholder": "Search a place…"
   },
