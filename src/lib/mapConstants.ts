@@ -41,3 +41,16 @@ export const SLOVAKIA_BOUNDS_MAPLIBRE: [number, number, number, number] = [
 // difference per feedback ("TomTom's clustering looks better, maybe just a
 // bigger radius... maybe something in between").
 export const MARKER_CLUSTER_RADIUS = 55;
+
+// Zoom level at which clusters fully dissolve into individual pins — shared
+// for the same reason as MARKER_CLUSTER_RADIUS above. This one also
+// silently diverged: @googlemaps/markerclusterer's SuperClusterAlgorithm
+// defaults to maxZoom 16 (its own AbstractAlgorithm/supercluster default),
+// while MapLibre's GeoJSON source defaults clusterMaxZoom to the *source's
+// own* maxzoom, which for a GeoJSON source with no maxzoom set is 18 — i.e.
+// MapLibre kept clustering two zoom levels further in than Google did,
+// which is exactly the kind of "clustering doesn't match at the same
+// distance" mismatch reported after the radius was already unified. Set to
+// MAX_ZOOM - 2 so it's still explicitly derived from one source of truth
+// rather than a second hardcoded number that could drift from MAX_ZOOM later.
+export const MARKER_CLUSTER_MAX_ZOOM = MAX_ZOOM - 2;

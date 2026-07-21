@@ -249,10 +249,7 @@ function classify(id: string, sourceLayer: string, layerType: string): Category 
 // one-off fetch used to try to read layer ids directly), lets country vs.
 // region be told apart from that built-in visual weighting instead of a
 // guessed keyword. Handles a plain number, a legacy stops-function object,
-// and a MapLibre "interpolate" expression (takes the first literal number in
-// the expression, which is the width at its lowest zoom stop — i.e. the
-// "zoomed out/world view" width, exactly where country vs. region borders
-// visually diverge the most).
+// and a MapLibre "interpolate" expression.
 function estimateBaseLineWidth(raw: unknown): number | null {
   if (typeof raw === "number") return raw;
   if (raw && typeof raw === "object" && !Array.isArray(raw) && "stops" in raw) {
@@ -263,6 +260,22 @@ function estimateBaseLineWidth(raw: unknown): number | null {
     return null;
   }
   if (Array.isArray(raw)) {
+    if (raw[0] === "interpolate") {
+      // ["interpolate", interpolationType, input, z1, w1, z2, w2, ...] --
+      // index 4 is the WIDTH at the first zoom stop. An earlier version of
+      // this function instead grabbed "the first number anywhere in the
+      // array", which is index 3 — the zoom *breakpoint* itself, not a
+      // width at all. That bug is exactly why classification looked
+      // zoom-band-dependent/inconsistent in testing: it was comparing a
+      // zoom number (e.g. "5") against ADMIN_COUNTRY_WIDTH_SIGNAL instead of
+      // an actual line width, so the country/region split was effectively
+      // random relative to how TomTom actually draws each layer.
+      const widthAtFirstStop = raw[4];
+      return typeof widthAtFirstStop === "number" ? widthAtFirstStop : null;
+    }
+    // Fallback for any other expression shape (e.g. "step") — not worth
+    // special-casing every possible MapLibre expression here, so just take
+    // the first bare number as a best-effort guess.
     const firstNumber = raw.find((v): v is number => typeof v === "number");
     return firstNumber ?? null;
   }

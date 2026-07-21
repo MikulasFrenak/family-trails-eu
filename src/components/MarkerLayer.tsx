@@ -7,7 +7,7 @@ import categoriesData from "../../data/categories.json";
 import type { Category } from "../types/poi";
 import { buildClusterPieIcon } from "../lib/clusterPieIcon";
 import { CATEGORY_ICONS } from "../lib/categoryIcons";
-import { MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
+import { MARKER_CLUSTER_MAX_ZOOM, MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
 
 const CATEGORIES = categoriesData as unknown as Category[];
 const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
@@ -83,14 +83,15 @@ export function MarkerLayer() {
       },
     };
 
-    // Explicit algorithm+radius so this matches MarkerLayerMapLibre's
-    // clusterRadius exactly (see MARKER_CLUSTER_RADIUS) instead of silently
-    // relying on this library's own default (60, vs. MapLibre's old 50).
+    // Explicit algorithm+radius+maxZoom so this matches MarkerLayerMapLibre's
+    // clusterRadius/clusterMaxZoom exactly (see mapConstants.ts) instead of
+    // silently relying on this library's own defaults (radius 60 vs.
+    // MapLibre's old 50; maxZoom 16 vs. MapLibre's old default of 18).
     const clusterer = new MarkerClusterer({
       map,
       markers,
       renderer: pieRenderer,
-      algorithm: new SuperClusterAlgorithm({ radius: MARKER_CLUSTER_RADIUS }),
+      algorithm: new SuperClusterAlgorithm({ radius: MARKER_CLUSTER_RADIUS, maxZoom: MARKER_CLUSTER_MAX_ZOOM }),
     });
 
     return () => {

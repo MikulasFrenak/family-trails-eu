@@ -6,7 +6,7 @@ import categoriesData from "../../data/categories.json";
 import type { Category, Poi } from "../types/poi";
 import { buildClusterPieIcon, type PieSegment } from "../lib/clusterPieIcon";
 import { CATEGORY_ICONS } from "../lib/categoryIcons";
-import { MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
+import { MARKER_CLUSTER_MAX_ZOOM, MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
 
 // NOTE: this file follows MapLibre's own "Display HTML clusters with custom
 // properties" pattern (clustered GeoJSON source + querySourceFeatures() +
@@ -117,6 +117,10 @@ export function MarkerLayerMapLibre({ map }: { map: maplibregl.Map }) {
       data: toFeatureCollection(visiblePois) as never,
       cluster: true,
       clusterRadius: MARKER_CLUSTER_RADIUS,
+      // Without this, a GeoJSON source's clusterMaxZoom defaults to the
+      // source's own maxzoom (18 here), two zoom levels past where Google's
+      // clusterer already dissolves clusters — see MARKER_CLUSTER_MAX_ZOOM.
+      clusterMaxZoom: MARKER_CLUSTER_MAX_ZOOM,
       clusterProperties: clusterProperties as never,
     });
     // MapLibre only tiles/clusters a GeoJSON source once a layer references
