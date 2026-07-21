@@ -54,8 +54,15 @@ const PLAYFUL: StylePalette = {
   water: "#7b86e0",
   park: "#2fae66",
   parkOutline: "#1f6d4c",
-  terrain: "#f5e9f2",
-  terrainAlt: "#e9d3ea",
+  // "Earth Cover" fills the *entire* landmass (it's TomTom's base landcover
+  // classification, not a sparse feature) — at full saturation this reads
+  // as a solid purple wash covering the whole map, very different from
+  // Google's much lighter paper-white base with terrain as subtle shading.
+  // Kept barely-tinted here instead, close to `background`, so lilac shows
+  // up as an accent (buildings, roads, boundaries) rather than as the
+  // dominant color of the entire viewport.
+  terrain: "#faf6fc",
+  terrainAlt: "#f3e6f2",
   building: "#e9d6f5",
   buildingOutline: "#c9a0e0",
   roadLocalFill: "#ffffff",
@@ -134,7 +141,15 @@ function classify(id: string, sourceLayer: string, layerType: string): Category 
     return "roadHighway";
   }
   if (/road/.test(hay)) return "roadLocal";
-  if (/boundary|administrative/.test(hay)) return "adminBoundary";
+  // Broader than just "boundary"/"administrative" — country/state/province/
+  // county/district border layers don't reliably use either word in their
+  // id (unverified against TomTom's exact naming, since the raw style fetch
+  // used to inspect ids got cut off before reaching the boundary/label
+  // section of the layers array — this list is a best-effort guess at
+  // common vector-tile boundary naming, not a confirmed match).
+  if (/boundary|administrative|admin[_ -]|country line|state line|province line|county line|district line/.test(hay)) {
+    return "adminBoundary";
+  }
   if (
     /earth cover|built-up|industrial|airport|runway|military|school ground|paved area|town grass|parking area|railway|subway|shopping|university/.test(
       hay,
