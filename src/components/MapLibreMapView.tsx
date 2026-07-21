@@ -35,15 +35,8 @@ export function MapLibreMapView() {
   useEffect(() => {
     if (!containerRef.current || !apiKey) return;
 
-    const instance = new maplibregl.Map({
-      container: containerRef.current,
-      style: provider.styleUrl(apiKey),
-      bounds: SLOVAKIA_BOUNDS_MAPLIBRE,
-      fitBoundsOptions: { padding: MAP_BOUNDS_PADDING },
-      minZoom: MIN_ZOOM,
-      maxZoom: MAX_ZOOM,
-    });
-
+    let cancelled = false;
+    let instance: maplibregl.Map | undefined;
     let loaded = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const disarm = () => {
@@ -57,25 +50,53 @@ export function MapLibreMapView() {
       }
     };
 
-    instance.on("load", () => {
-      loaded = true;
-      disarm();
-      setMap(instance);
-    });
-    // A bad/unauthorized key surfaces here (style or tile request failing),
-    // same bucket as Google's gm_authFailure — retrying won't help without
-    // a valid, entitled key, so this goes to the non-retryable fallback.
-    instance.on("error", () => {
-      if (!loaded) setFailure("auth");
-    });
+    // buildStyle fetches TomTom's style JSON and patches in the "sources"
+    // block it doesn't include on its own (see mapLibreProviders.ts) — the
+    // map can't be constructed until that resolves.
+    provider
+      .buildStyle(apiKey)
+      .then((style) => {
+        if (cancelled || !containerRef.current) return;
 
-    arm();
+        instance = new maplibregl.Map({
+          container: containerRef.current,
+          // Cast, not a precisely-known type name — see the same pattern
+          // (and reasoning) in MarkerLayerMapLibre.tsx.
+          style: style as never,
+          bounds: SLOVAKIA_BOUNDS_MAPLIBRE,
+          fitBoundsOptions: { padding: MAP_BOUNDS_PADDING },
+          minZoom: MIN_ZOOM,
+          maxZoom: MAX_ZOOM,
+        });
+
+        instance.on("load", () => {
+          loaded = true;
+          disarm();
+          if (!cancelled) setMap(instance ?? null);
+        });
+        // A bad/unauthorized key surfaces here (a tile request failing),
+        // same bucket as Google's gm_authFailure — retrying won't help
+        // without a valid, entitled key, so this goes to the non-retryable
+        // fallback.
+        instance.on("error", () => {
+          if (!loaded && !cancelled) setFailure("auth");
+        });
+
+        arm();
+      })
+      .catch(() => {
+        // Style fetch itself failed (bad key, network, TomTom outage) —
+        // same non-retryable bucket as an in-map error.
+        if (!cancelled) setFailure("auth");
+      });
+
     document.addEventListener("visibilitychange", arm);
 
     return () => {
+      cancelled = true;
       disarm();
       document.removeEventListener("visibilitychange", arm);
-      instance.remove();
+      instance?.remove();
       setMap(null);
     };
   }, [apiKey, attempt]);
