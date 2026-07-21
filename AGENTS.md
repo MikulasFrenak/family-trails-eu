@@ -10,8 +10,12 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
 
 ```
 /src
-  /components     # MapView, CategoryFilter, LanguageSwitcher, POIDetailPanel, MarkerLayer,
-                   # StyleSwitcher, ZoomControl, MapLayerSettings, MapLoadFallback, FilterControl
+  /components     # MapView (thin provider switch) → GoogleMapView (clean Google Maps impl,
+                   # MarkerLayer, ZoomControl) or MapLibreMapView (vector-tile impl, currently
+                   # TomTom only — MarkerLayerMapLibre, ZoomControlMapLibre), plus
+                   # CategoryFilter, LanguageSwitcher, StyleSwitcher (Google-only styles),
+                   # MapProviderSwitcher, MapLayerSettings, MapLoadFallback, FilterControl,
+                   # POIDetailPanel
   /mapStyles      # playful.json, nature.json — hand-authored Google Maps style arrays
   /assets/markers # custom SVG category pin icons (reused in filter chips + POI badge)
   /i18n           # react-i18next config + en/cz/sk dictionaries
@@ -38,9 +42,9 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
 ## Stack Decisions
 
 - React 19 + TypeScript + Vite
-- Google Maps JavaScript API via `@vis.gl/react-google-maps`, clustering via `@googlemaps/markerclusterer`
+- Two map engines behind a `mapProvider` store switch, Google by default: Google Maps JavaScript API via `@vis.gl/react-google-maps` (clustering via `@googlemaps/markerclusterer`), or `maplibre-gl` for vector-tile providers (TomTom only for now — see `src/lib/mapLibreProviders.ts` and `PLAN.md` §8; MapLibre's own GeoJSON-source clustering + HTML markers, no separate clustering library). `GoogleMapView.tsx` is kept deliberately unmodified/clean; provider-specific logic never leaks into it.
 - `react-i18next` + `i18next-browser-languagedetector`
-- Zustand for global state (country, language, map style, map type, category filters, layer-visibility toggles)
+- Zustand for global state (country, language, map provider, map style, map type, category filters, layer-visibility toggles)
 - Cloudflare Pages for hosting
 - Vitest (jsdom) for unit tests — pure logic/hooks only, see `PLAN.md` §2 Testing
 
@@ -99,6 +103,7 @@ For any non-trivial task: search for current best practices first, identify 2–
 
 This repo is public. Never commit:
 - The Google Maps API key or any secret (key lives in Cloudflare Pages env vars as `VITE_GOOGLE_MAPS_API_KEY`, never in source)
+- The TomTom API key (same treatment — Cloudflare Pages env var `VITE_TOMTOM_MAPS_API_KEY`, never in source)
 - Personal file-system paths or personal email addresses
 - Any cloud/tenant/project ID beyond what's needed to run the app
 
@@ -109,6 +114,7 @@ Run `/public-repo-check` before every push.
 ## Setup
 
 1. Google Cloud project with Maps JavaScript API + Places API enabled, key restricted by HTTP referrer to the deployed domain(s) — done via a hard daily quota cap rather than a spend budget (budgets only alert, quotas actually prevent charges).
-2. Deployed on Cloudflare (Workers-with-static-assets, git-connected — auto-deploys on push to `main`); `VITE_GOOGLE_MAPS_API_KEY` is a **build-time** env var there, not a runtime secret — Vite bakes `import.meta.env.VITE_*` into the bundle at build, so it must be set in the project's build-environment-variables settings (not "Variables and Secrets", which is Worker-runtime-only and won't affect the build).
-3. `npm install`, then put the real key in `.env.local` (gitignored, never commit it) as `VITE_GOOGLE_MAPS_API_KEY=...`, then `npm run dev`.
-4. `npm run validate-poi` checks `/data/poi/*.json` against `data/schema.md`; `npm run build` runs a full typecheck + production build; `npm run test` runs the Vitest suite once, `npm run test:watch` for watch mode.
+2. TomTom Developer Portal account, API key from the Maps Display API (free tier: 50,000 tile requests/day). No referrer restriction UI as of writing — rely on the daily quota instead, same reasoning as the Google key.
+3. Deployed on Cloudflare (Workers-with-static-assets, git-connected — auto-deploys on push to `main`); both `VITE_GOOGLE_MAPS_API_KEY` and `VITE_TOMTOM_MAPS_API_KEY` are **build-time** env vars there, not runtime secrets — Vite bakes `import.meta.env.VITE_*` into the bundle at build, so they must be set in the project's build-environment-variables settings (not "Variables and Secrets", which is Worker-runtime-only and won't affect the build).
+4. `npm install`, then put the real keys in `.env.local` (gitignored, never commit it) as `VITE_GOOGLE_MAPS_API_KEY=...` and `VITE_TOMTOM_MAPS_API_KEY=...`, then `npm run dev`.
+5. `npm run validate-poi` checks `/data/poi/*.json` against `data/schema.md`; `npm run build` runs a full typecheck + production build; `npm run test` runs the Vitest suite once, `npm run test:watch` for watch mode.

@@ -3,13 +3,18 @@ import { MapView } from "./components/MapView";
 import { CategoryFilter } from "./components/CategoryFilter";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { StyleSwitcher } from "./components/StyleSwitcher";
+import { MapProviderSwitcher } from "./components/MapProviderSwitcher";
 import { POIDetailPanel } from "./components/POIDetailPanel";
 import { MapLayerSettings } from "./components/MapLayerSettings";
 import { useIsMobile } from "./hooks/useIsMobile";
+import { useAppStore } from "./store/useAppStore";
 
 export default function App() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  // Google-only visual styles (playful/nature) are meaningless once the map
+  // engine itself is MapLibre — hide the pill instead of leaving it inert.
+  const mapProvider = useAppStore((s) => s.mapProvider);
 
   return (
     <div className="flex h-screen w-screen flex-col bg-brand-paper">
@@ -21,7 +26,8 @@ export default function App() {
         <div className="flex items-center gap-2 sm:gap-3">
           {!isMobile && (
             <div className="flex items-center gap-2 sm:gap-3">
-              <StyleSwitcher />
+              <MapProviderSwitcher />
+              {mapProvider === "google" && <StyleSwitcher />}
               <LanguageSwitcher />
             </div>
           )}

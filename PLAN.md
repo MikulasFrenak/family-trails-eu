@@ -161,7 +161,7 @@ Architecture implication when this gets picked up: needs an auth provider (e.g. 
 
 ---
 
-## 8. Map provider abstraction — TomTom/MapLibre/OSM research (Phase 8, not started)
+## 8. Map provider abstraction — TomTom/MapLibre/OSM research (Phase 8, v1 built on `feature/maplibre-tomtom-provider`)
 
 **Goal (revised):** primarily a **learning project** — an optional, user-visible switcher to pick/change the map provider/base layer (Google vs. TomTom-via-MapLibre vs. OpenStreetMap-data-via-MapLibre), to understand how each actually works under the hood. Resilience (auto-failover away from a Google quota failure) is a secondary, possible benefit, not the primary driver. This section is **research only** — no implementation decision made yet, per this playbook's Research Before Implementing convention.
 
@@ -234,3 +234,16 @@ What needs a **separate implementation per rendering engine** (i.e. one Google i
 - [OpenMapTiles — Ready to use API via MapTiler Cloud](https://openmaptiles.org/docs/host/maptiler-cloud/)
 
 **Next step:** not an implementation task yet. Settle the open questions above, then run `/create-task` for a scoped v1 — recommend starting with the shared `MapLibreProvider` built against **one** source first (TomTom, since it has the clearest free-tier headroom), prove the interface works, then add MapTiler as the second source through the same adapter before touching styling parity or auto-failover.
+
+### v1 implementation notes (TomTom-only, this pass)
+
+Built directly on the explicit go-ahead ("Maplibre + tomtom najprv... jednu cistu Google map implementaciu... Vedla toho MapLibre implementaciu s moznymi providermi") — a manual switcher only (open question 1: yes, manual-only, no auto-failover yet), one default TomTom style with no attempt at `playful`/`nature` parity (open question 2: settled — TomTom gets its own look, doesn't need to match Google).
+
+- `GoogleMapView.tsx` — the old `MapView.tsx`, moved verbatim, unmodified.
+- `MapView.tsx` — now a thin switch on `useAppStore().mapProvider` (`"google" | "maplibre"`, default `"google"`).
+- `MapLibreMapView.tsx` / `MarkerLayerMapLibre.tsx` / `ZoomControlMapLibre.tsx` — the MapLibre-side implementation, structurally parallel to the Google files but not sharing code with them (per the "separate render glue" finding above). Clustering uses MapLibre's native GeoJSON-source `cluster`/`clusterProperties` (no separate library — no `supercluster` dependency added), with a pool of manually-synced HTML `maplibregl.Marker` elements for both individual POIs and pie-chart cluster icons (`querySourceFeatures` + `render` event), following [MapLibre's own reference pattern](https://maplibre.org/maplibre-gl-js/docs/examples/display-html-clusters-with-custom-properties/) for HTML clusters with custom properties.
+- `src/lib/mapLibreProviders.ts` — the provider registry the "one shared adapter" recommendation above pointed at; today it has exactly one entry (`tomtom`), keyed by `VITE_TOMTOM_MAPS_API_KEY`. Adding MapTiler later is meant to be a second entry here, not a new component.
+- TomTom style source: not their newer `@tomtom-org/maps-sdk` (proprietary wrapper, TomTom-specific, doesn't fit a shared multi-provider adapter) — instead their plain Merged Style JSON endpoint (`https://api.tomtom.com/style/1/style/*?key=...&map=basic_main`), which is genuine MapLibre Style Spec and needs nothing but `maplibre-gl` itself. Maps SDK for Web v6 is deprecated (Feb 2026 CDN withdrawal) and was deliberately avoided.
+- `src/lib/mapConstants.ts` — added `SLOVAKIA_BOUNDS_MAPLIBRE`, derived from the existing `SLOVAKIA_BOUNDS` object rather than re-entering the four numbers.
+- **Not yet done:** MapTiler/OSM as a second MapLibre source (open questions 3–4 still open), auto-failover, and any TomTom style customization beyond the default `basic_main`.
+- **Verification gap:** this was written in a sandbox with no access to the npm registry and a `node_modules` tree that doesn't match its own architecture (native `rolldown` bindings failed even for the pre-existing Vitest suite) — none of this could be `npm install`ed, type-checked, or run. Treat it as unverified until `npm install && npm run build && npm run test` pass locally, plus a manual pan/zoom/filter/cluster-click pass in the browser with a real `VITE_TOMTOM_MAPS_API_KEY`.

@@ -6,6 +6,10 @@
     "playful": "Hravá",
     "nature": "Příroda"
   },
+  "mapProvider": {
+    "google": "Google",
+    "maplibre": "TomTom"
+  },
   "categoryFilter": {
     "all": "Vše"
   },
@@ -25,6 +29,7 @@
   },
   "mapLayers": {
     "title": "Vrstvy mapy",
+    "provider": "Poskytovatel mapy",
     "style": "Styl mapy",
     "language": "Jazyk",
     "mapView": "Zobrazení mapy",

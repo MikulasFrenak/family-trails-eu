@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppStore, type Language, type MapStyleId, type MapTypeId } from "../store/useAppStore";
+import { useAppStore, type Language, type MapProvider, type MapStyleId, type MapTypeId } from "../store/useAppStore";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useLanguageChange } from "../hooks/useLanguageChange";
 
 const MAP_TYPES: MapTypeId[] = ["terrain", "roadmap", "satellite"];
 const MAP_STYLES: MapStyleId[] = ["playful", "nature"];
+const MAP_PROVIDERS: MapProvider[] = ["google", "maplibre"];
 const LANGUAGES: Language[] = ["en", "cz", "sk"];
 
 export function MapLayerSettings() {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const mapProvider = useAppStore((s) => s.mapProvider);
+  const setMapProvider = useAppStore((s) => s.setMapProvider);
   const mapStyle = useAppStore((s) => s.mapStyle);
   const setMapStyle = useAppStore((s) => s.setMapStyle);
   const language = useAppStore((s) => s.language);
@@ -53,23 +56,45 @@ export function MapLayerSettings() {
                 inline pills aren't rendered at all (see useIsMobile). */}
             {isMobile && (
               <div>
-                <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.style")}</p>
+                <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.provider")}</p>
                 <div className="flex gap-1 px-2 pb-2">
-                  {MAP_STYLES.map((style) => (
+                  {MAP_PROVIDERS.map((provider) => (
                     <button
-                      key={style}
+                      key={provider}
                       type="button"
-                      onClick={() => setMapStyle(style)}
+                      onClick={() => setMapProvider(provider)}
                       className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors ${
-                        mapStyle === style
+                        mapProvider === provider
                           ? "bg-brand-forest text-white"
                           : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
                       }`}
                     >
-                      {t(`mapStyle.${style}`)}
+                      {t(`mapProvider.${provider}`)}
                     </button>
                   ))}
                 </div>
+
+                {mapProvider === "google" && (
+                  <>
+                    <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.style")}</p>
+                    <div className="flex gap-1 px-2 pb-2">
+                      {MAP_STYLES.map((style) => (
+                        <button
+                          key={style}
+                          type="button"
+                          onClick={() => setMapStyle(style)}
+                          className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors ${
+                            mapStyle === style
+                              ? "bg-brand-forest text-white"
+                              : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
+                          }`}
+                        >
+                          {t(`mapStyle.${style}`)}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
 
                 <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.language")}</p>
                 <div className="flex gap-1 px-2 pb-2">
@@ -91,46 +116,52 @@ export function MapLayerSettings() {
               </div>
             )}
 
-            <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.mapView")}</p>
-            <div className="flex gap-1 px-2 pb-2">
-              {MAP_TYPES.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => setMapTypeId(type)}
-                  className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors ${
-                    mapTypeId === type
-                      ? "bg-brand-forest text-white"
-                      : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
-                  }`}
-                >
-                  {t(`mapLayers.${type}`)}
-                </button>
-              ))}
-            </div>
+            {/* Map type + label toggles are Google-specific (styles.json
+                stylers) — MapLibreMapView doesn't read any of this state. */}
+            {mapProvider === "google" && (
+              <>
+                <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.mapView")}</p>
+                <div className="flex gap-1 px-2 pb-2">
+                  {MAP_TYPES.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setMapTypeId(type)}
+                      className={`flex-1 rounded-full px-2 py-1.5 text-xs font-semibold transition-colors ${
+                        mapTypeId === type
+                          ? "bg-brand-forest text-white"
+                          : "bg-brand-mint-line/60 text-brand-ink-soft hover:bg-brand-mint-line"
+                      }`}
+                    >
+                      {t(`mapLayers.${type}`)}
+                    </button>
+                  ))}
+                </div>
 
-            <p className="px-2 pb-1 pt-2 font-display text-sm font-semibold">{t("mapLayers.title")}</p>
-            {isSatellite && (
-              <p className="px-2 pb-2 text-xs text-brand-ink-soft">{t("mapLayers.satelliteNote")}</p>
+                <p className="px-2 pb-1 pt-2 font-display text-sm font-semibold">{t("mapLayers.title")}</p>
+                {isSatellite && (
+                  <p className="px-2 pb-2 text-xs text-brand-ink-soft">{t("mapLayers.satelliteNote")}</p>
+                )}
+                <div className={isSatellite ? "pointer-events-none opacity-40" : undefined}>
+                  <ToggleRow label={t("mapLayers.roads")} checked={showRoads} onChange={setShowRoads} />
+                  <ToggleRow
+                    label={t("mapLayers.placeNames")}
+                    checked={showPlaceLabels}
+                    onChange={setShowPlaceLabels}
+                  />
+                  <ToggleRow
+                    label={t("mapLayers.mountains")}
+                    checked={showMountainLabels}
+                    onChange={setShowMountainLabels}
+                  />
+                  <ToggleRow
+                    label={t("mapLayers.rivers")}
+                    checked={showWaterLabels}
+                    onChange={setShowWaterLabels}
+                  />
+                </div>
+              </>
             )}
-            <div className={isSatellite ? "pointer-events-none opacity-40" : undefined}>
-              <ToggleRow label={t("mapLayers.roads")} checked={showRoads} onChange={setShowRoads} />
-              <ToggleRow
-                label={t("mapLayers.placeNames")}
-                checked={showPlaceLabels}
-                onChange={setShowPlaceLabels}
-              />
-              <ToggleRow
-                label={t("mapLayers.mountains")}
-                checked={showMountainLabels}
-                onChange={setShowMountainLabels}
-              />
-              <ToggleRow
-                label={t("mapLayers.rivers")}
-                checked={showWaterLabels}
-                onChange={setShowWaterLabels}
-              />
-            </div>
           </div>
         </>
       )}

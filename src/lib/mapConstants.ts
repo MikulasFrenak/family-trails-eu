@@ -15,5 +15,16 @@ export const SLOVAKIA_BOUNDS: google.maps.LatLngBoundsLiteral = {
 };
 // Kept small on purpose — the whole point of fitBounds is the tightest zoom
 // that still shows the full country, this is just enough padding that edge
-// pins/borders aren't literally touching the viewport edge.
+// pins/borders aren't literally touching the viewport edge. Same pixel value
+// works for MapLibre's fitBoundsOptions.padding, no separate constant needed.
 export const MAP_BOUNDS_PADDING = 12;
+
+// MapLibre's LngLatBoundsLike wants [west, south, east, north] rather than
+// Google's {south,west,north,east} object — derived from SLOVAKIA_BOUNDS
+// above so the two never drift apart.
+export const SLOVAKIA_BOUNDS_MAPLIBRE: [number, number, number, number] = [
+  SLOVAKIA_BOUNDS.west,
+  SLOVAKIA_BOUNDS.south,
+  SLOVAKIA_BOUNDS.east,
+  SLOVAKIA_BOUNDS.north,
+];
