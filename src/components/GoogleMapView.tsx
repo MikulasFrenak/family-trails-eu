@@ -115,6 +115,13 @@ export function GoogleMapView() {
         defaultBounds={{ ...SLOVAKIA_BOUNDS, padding: MAP_BOUNDS_PADDING }}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
+        // Raster maps (the default render type here — no mapId/vector
+        // opt-in) default isFractionalZoomEnabled to false, so fitBounds()
+        // snaps to the nearest *lower* integer zoom and leaves noticeably
+        // more empty margin around SLOVAKIA_BOUNDS than MapLibre's
+        // continuous/fractional zoom fit on the TomTom view. Turning this on
+        // lets Google's fitBounds match TomTom's tighter default framing.
+        isFractionalZoomEnabled
         mapTypeId={mapTypeId}
         styles={styles}
         disableDefaultUI
