@@ -7,22 +7,19 @@ export const MIN_ZOOM = 6;
 export const MAX_ZOOM = 18;
 
 // Google Maps' JS API and MapLibre/TomTom don't count zoom the same way for
-// the same on-screen scale. Two rounds of trying to derive/tune a shared
-// "GOOGLE_ZOOM_OFFSET" added *to* MIN_ZOOM/MAX_ZOOM (based on published
-// reports that Google's number should run higher than Mapbox/MapLibre's for
-// the same view) went the wrong way in practice: raising GOOGLE_MIN_ZOOM
-// above MIN_ZOOM made Google's floor (10) end up *higher* than the zoom
-// defaultBounds/fitBounds naturally computes to fit all of Slovakia — the
-// SDK clamps the initial view up to minZoom when the fitted zoom is lower
-// than it, which broke the default centered view entirely (it started
-// zoomed in far past the whole country). Direct feedback confirmed the
-// floor needed to go the other way — *lower* than MIN_ZOOM, not higher — to
-// let Google zoom out at least as far as TomTom, and to stay safely below
-// whatever zoom fitBounds picks for SLOVAKIA_BOUNDS so it can never clamp
-// the default view again. No more derived "offset" model for either bound —
-// both are independent, empirically-set numbers now; adjust either directly
-// based on what's actually observed rather than a shared formula.
-export const GOOGLE_MIN_ZOOM = 3;
+// the same on-screen scale, but three rounds of trying to compensate for
+// that (a shared "GOOGLE_ZOOM_OFFSET" added to MIN_ZOOM/MAX_ZOOM, then an
+// unconditionally-low GOOGLE_MIN_ZOOM=3 to fix a resulting default-centering
+// regression) both overcorrected in practice — 3 let Google zoom out to a
+// whole-earth view, way past anything actually useful. Back to matching
+// MIN_ZOOM directly: 6 is confirmed safely below whatever zoom
+// defaultBounds/fitBounds computes for SLOVAKIA_BOUNDS (so it won't clamp
+// the default view like the offset version did), while not being so low it
+// allows zooming out past the app's useful range. Kept as its own constant
+// (not just reusing MIN_ZOOM inline) in case a real difference is confirmed
+// later — but starting from "the same as TomTom" is the safer baseline
+// after two rounds of guessing wrong in the other direction.
+export const GOOGLE_MIN_ZOOM = MIN_ZOOM;
 export const GOOGLE_MAX_ZOOM = MAX_ZOOM;
 
 // Slovakia's approximate geographic extent — used to fit the whole country
