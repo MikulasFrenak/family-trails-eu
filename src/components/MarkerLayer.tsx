@@ -49,8 +49,6 @@ export function MarkerLayer() {
       return marker;
     });
 
-    // Cluster icon = a pie chart of the categories grouped inside it, so you
-    // can tell what's in a cluster before zooming/clicking into it.
     const pieRenderer: Renderer = {
       render: (cluster) => {
         const counts = new Map<string, number>();
@@ -83,11 +81,6 @@ export function MarkerLayer() {
       },
     };
 
-    // GOOGLE_MARKER_CLUSTER_RADIUS/GOOGLE_MARKER_CLUSTER_MAX_ZOOM (see
-    // mapConstants.ts) are Google's own independently-tuned copies of
-    // TomTom's MARKER_CLUSTER_RADIUS/MARKER_CLUSTER_MAX_ZOOM — radius bumped
-    // up a bit per feedback that Google's clustering needed to feel a
-    // little more aggressive for equivalent behavior between providers.
     const clusterer = new MarkerClusterer({
       map,
       markers,

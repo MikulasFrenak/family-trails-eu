@@ -1,7 +1,5 @@
 import { useTranslation } from "react-i18next";
 
-// Without `onRetry`: the auth/quota dead-end ("come back tomorrow").
-// With `onRetry`: a transient tile-load timeout — different message + button.
 export function MapLoadFallback({ onRetry }: { onRetry?: () => void }) {
   const { t } = useTranslation();
 

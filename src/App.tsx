@@ -24,10 +24,6 @@ export default function App() {
         <div className="flex items-center gap-2 sm:gap-3">
           {!isMobile && (
             <div className="flex items-center gap-2 sm:gap-3">
-              {/* Three switcher groups plus the title don't fit one header
-                  line below md (768px) — moves into MapLayerSettings'
-                  dropdown in that 640–767px gap instead of wrapping the
-                  header (see useIsCompact). */}
               {!isCompact && <MapProviderSwitcher />}
               <StyleSwitcher />
               <LanguageSwitcher />
@@ -45,9 +41,6 @@ export default function App() {
   );
 }
 
-// Replaces the 🧭 emoji with a badge matching the marker icon system: a
-// circle badge + a two-tone compass needle, same drop-shadow convention as
-// the map pins in src/assets/markers/.
 function CompassLogo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true">

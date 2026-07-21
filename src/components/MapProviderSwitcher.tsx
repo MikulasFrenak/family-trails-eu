@@ -3,9 +3,6 @@ import { useAppStore, type MapProvider } from "../store/useAppStore";
 
 const PROVIDERS: MapProvider[] = ["google", "maplibre"];
 
-// Same pill pattern as StyleSwitcher — deliberately not merged with it, since
-// this switches map *engines* (Google vs. MapLibre/TomTom) while
-// StyleSwitcher switches Google-only visual styles (playful/nature).
 export function MapProviderSwitcher() {
   const { t } = useTranslation();
   const mapProvider = useAppStore((s) => s.mapProvider);

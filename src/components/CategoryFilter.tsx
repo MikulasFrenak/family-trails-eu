@@ -51,8 +51,6 @@ export function CategoryFilter() {
 
   return (
     <div className="relative bg-brand-paper-raised px-4 py-3 shadow-sm">
-      {/* Invisible clone, always fully rendered, used only to measure each
-          chip's natural width so we know how many fit before overflowing. */}
       <div
         className="pointer-events-none invisible absolute inset-x-4 top-3 flex items-center gap-2"
         aria-hidden="true"

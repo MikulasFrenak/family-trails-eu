@@ -54,12 +54,6 @@ export function MapLayerSettings() {
             onClick={() => setOpen(false)}
           />
           <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-2xl bg-brand-paper-raised p-2 text-brand-ink shadow-xl ring-1 ring-brand-mint-line">
-            {/* Provider lives here whenever it doesn't fit the header
-                (isCompact, <768px) — a wider range than style/language
-                below, since the header can't fit title + all three
-                switcher groups + this icon below md. isMobile is always
-                also isCompact (640 < 768), so this still covers the full
-                mobile dropdown too. */}
             {isCompact && (
               <div>
                 <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.provider")}</p>
@@ -82,11 +76,6 @@ export function MapLayerSettings() {
               </div>
             )}
 
-            {/* Style + language live here only on mobile, where the header's
-                inline pills aren't rendered at all (see useIsMobile) — these
-                two fit inline down to 640px, unlike the provider switcher
-                above. Style now applies to both providers (see
-                mapLibreStyleOverrides.ts), so it's no longer Google-gated. */}
             {isMobile && (
               <div>
                 <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.style")}</p>
@@ -127,9 +116,6 @@ export function MapLayerSettings() {
               </div>
             )}
 
-            {/* Map type (terrain/roadmap/satellite) is Google-only — it maps
-                to Google's mapTypeId prop, which MapLibre has no equivalent
-                for (TomTom's basic_main is always a street-map style). */}
             {mapProvider === "google" && (
               <>
                 <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.mapView")}</p>
@@ -152,11 +138,6 @@ export function MapLayerSettings() {
               </>
             )}
 
-            {/* Road/label toggles apply to both providers now: Google reads
-                them via HIDE_*_STYLE stylers in GoogleMapView, MapLibre via
-                setLayoutProperty in StyleOverrideMapLibre /
-                applyMapLibreLayerVisibility. isSatellite dimming stays
-                Google-only since "satellite" isn't a MapLibre concept. */}
             <p className="px-2 pb-1 pt-2 font-display text-sm font-semibold">{t("mapLayers.title")}</p>
             {mapProvider === "google" && isSatellite && (
               <p className="px-2 pb-2 text-xs text-brand-ink-soft">{t("mapLayers.satelliteNote")}</p>

@@ -2,9 +2,6 @@ import type maplibregl from "maplibre-gl";
 import { useEffect, useState } from "react";
 import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS_MAPLIBRE, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 
-// MapLibre equivalent of ZoomControl.tsx — same markup/behaviour, but driven
-// by the vanilla maplibregl.Map instance passed down from MapLibreMapView
-// instead of the @vis.gl/react-google-maps useMap() hook.
 export function ZoomControlMapLibre({ map }: { map: maplibregl.Map }) {
   const [zoom, setZoom] = useState(map.getZoom());
 

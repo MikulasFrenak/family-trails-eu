@@ -14,8 +14,6 @@ const MAP_STYLES: Record<MapStyleId, google.maps.MapTypeStyle[]> = {
   nature: natureStyle as google.maps.MapTypeStyle[],
 };
 
-// Google Maps JS API expects ISO language codes — our "cz" store value means
-// "Czech language" but the actual ISO/Maps code for Czech is "cs".
 const GOOGLE_MAPS_LANGUAGE: Record<Language, string> = {
   en: "en",
   cz: "cs",
@@ -45,8 +43,6 @@ const HIDE_WATER_LABELS_STYLE: google.maps.MapTypeStyle = {
   stylers: [{ visibility: "off" }],
 };
 
-// Generous on purpose: slow connections and cold caches legitimately take a
-// while, and a false "failed" is worse than a slow map — see TileLoadWatcher.
 const LOAD_TIMEOUT_MS = 15000;
 
 declare global {
@@ -55,10 +51,6 @@ declare global {
   }
 }
 
-// This is the one clean, unmodified Google Maps implementation — kept
-// deliberately free of anything provider-abstraction-related (no shared
-// interface, no MapLibre imports). MapView.tsx picks between this and
-// MapLibreMapView based on the store's mapProvider; don't blend them here.
 export function GoogleMapView() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const mapStyle = useAppStore((s) => s.mapStyle);
@@ -68,9 +60,6 @@ export function GoogleMapView() {
   const showPlaceLabels = useAppStore((s) => s.showPlaceLabels);
   const showMountainLabels = useAppStore((s) => s.showMountainLabels);
   const showWaterLabels = useAppStore((s) => s.showWaterLabels);
-  // 'auth' = key/quota problem (retry won't help, message says come back
-  // tomorrow); 'timeout' = tiles just didn't arrive in time (transient —
-  // slow network, cold cache, lazy iframe), so the fallback offers a retry.
   const [failure, setFailure] = useState<null | "auth" | "timeout">(null);
   const [attempt, setAttempt] = useState(0);
 
@@ -107,20 +96,11 @@ export function GoogleMapView() {
   }
 
   return (
-    // Google Maps only reads `language` when its script first loads (the
-    // LanguageSwitcher does a full page reload to actually change it).
-    // `key={attempt}` remounts the whole provider on retry.
     <APIProvider key={attempt} apiKey={apiKey} language={GOOGLE_MAPS_LANGUAGE[language]}>
       <Map
         defaultBounds={{ ...SLOVAKIA_BOUNDS, padding: MAP_BOUNDS_PADDING }}
         minZoom={GOOGLE_MIN_ZOOM}
         maxZoom={GOOGLE_MAX_ZOOM}
-        // Raster maps (the default render type here — no mapId/vector
-        // opt-in) default isFractionalZoomEnabled to false, so fitBounds()
-        // snaps to the nearest *lower* integer zoom and leaves noticeably
-        // more empty margin around SLOVAKIA_BOUNDS than MapLibre's
-        // continuous/fractional zoom fit on the TomTom view. Turning this on
-        // lets Google's fitBounds match TomTom's tighter default framing.
         isFractionalZoomEnabled
         mapTypeId={mapTypeId}
         styles={styles}
@@ -147,9 +127,6 @@ function TileLoadWatcher({ onFail }: { onFail: () => void }) {
     return () => listener.remove();
   }, [map]);
 
-  // Watchdog only counts time while the page is actually visible — in a
-  // background tab (or before a lazy iframe scrolls into view) the browser
-  // legitimately postpones tile loading, and that must not count as failure.
   useEffect(() => {
     if (loaded || !map) return;
 

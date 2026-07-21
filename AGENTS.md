@@ -52,6 +52,14 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
 
 ---
 
+## Code Comments
+
+No narrative comments in `.ts`/`.tsx` files — rely on clear naming and small functions instead. Don't narrate debugging history ("tried X, it overcorrected, landed on Y") or restate what the code already says.
+
+Non-obvious functionality (TomTom style-override heuristics, the Google/MapLibre zoom-scale and clustering-algorithm mismatch, hillshade tile decoding, etc.) is documented in `PLAN.md` §8 instead of inline — that's the doc home for this kind of note, not a per-file comment block. The "why we changed this" history lives in commit messages and git log.
+
+---
+
 ## Branching & Commits
 
 Personal project, not ticket-tracked:

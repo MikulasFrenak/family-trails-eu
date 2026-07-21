@@ -1,12 +1,5 @@
 import { useTranslation } from "react-i18next";
 
-// Shown while the MapLibre/TomTom instance is mounting — from the moment the
-// container exists until "load" fires and MapLibreMapView sets `map`. Purely
-// cosmetic (the style.load handler in MapLibreMapView already wins the color
-// race against TomTom's default green/tan style — see that file's comment),
-// but even with correct colors applied instantly, tiles still take a beat to
-// fetch, so this covers "empty/half-drawn map" with something intentional
-// instead of a bare gray container flashing in.
 export function MapLoadingOverlay() {
   const { t } = useTranslation();
 
