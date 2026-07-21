@@ -7,7 +7,7 @@ import categoriesData from "../../data/categories.json";
 import type { Category } from "../types/poi";
 import { buildClusterPieIcon } from "../lib/clusterPieIcon";
 import { CATEGORY_ICONS } from "../lib/categoryIcons";
-import { MARKER_CLUSTER_MAX_ZOOM, MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
+import { GOOGLE_MARKER_CLUSTER_MAX_ZOOM, GOOGLE_MARKER_CLUSTER_RADIUS } from "../lib/mapConstants";
 
 const CATEGORIES = categoriesData as unknown as Category[];
 const CATEGORY_COLORS: Record<string, string> = Object.fromEntries(
@@ -83,15 +83,19 @@ export function MarkerLayer() {
       },
     };
 
-    // Explicit algorithm+radius+maxZoom so this matches MarkerLayerMapLibre's
-    // clusterRadius/clusterMaxZoom exactly (see mapConstants.ts) instead of
-    // silently relying on this library's own defaults (radius 60 vs.
-    // MapLibre's old 50; maxZoom 16 vs. MapLibre's old default of 18).
+    // GOOGLE_MARKER_CLUSTER_RADIUS/GOOGLE_MARKER_CLUSTER_MAX_ZOOM (see
+    // mapConstants.ts) are TomTom's MARKER_CLUSTER_RADIUS/MARKER_CLUSTER_MAX_ZOOM
+    // with GOOGLE_ZOOM_OFFSET-aware adjustments applied — Google's own zoom
+    // numbering runs about 2 higher than MapLibre's for the same visual
+    // scale (256px vs 512px tile pyramids), so a literal shared number
+    // doesn't actually group/dissolve at the same real-world distance on
+    // both providers even though it's the same npm `supercluster` library
+    // underneath both.
     const clusterer = new MarkerClusterer({
       map,
       markers,
       renderer: pieRenderer,
-      algorithm: new SuperClusterAlgorithm({ radius: MARKER_CLUSTER_RADIUS, maxZoom: MARKER_CLUSTER_MAX_ZOOM }),
+      algorithm: new SuperClusterAlgorithm({ radius: GOOGLE_MARKER_CLUSTER_RADIUS, maxZoom: GOOGLE_MARKER_CLUSTER_MAX_ZOOM }),
     });
 
     return () => {

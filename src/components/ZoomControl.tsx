@@ -1,6 +1,6 @@
 import { useMap } from "@vis.gl/react-google-maps";
 import { useEffect, useState } from "react";
-import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
+import { GOOGLE_MIN_ZOOM, GOOGLE_MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 
 export function ZoomControl() {
   const map = useMap();
@@ -24,8 +24,8 @@ export function ZoomControl() {
     map.fitBounds(SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING);
   };
 
-  const atMax = zoom !== null && zoom >= MAX_ZOOM;
-  const atMin = zoom !== null && zoom <= MIN_ZOOM;
+  const atMax = zoom !== null && zoom >= GOOGLE_MAX_ZOOM;
+  const atMin = zoom !== null && zoom <= GOOGLE_MIN_ZOOM;
 
   return (
     <div className="absolute right-3 top-3 z-10 flex flex-col overflow-hidden rounded-xl shadow-lg ring-1 ring-brand-mint-line sm:right-4 sm:top-4">

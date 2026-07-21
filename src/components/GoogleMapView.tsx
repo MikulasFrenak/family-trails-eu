@@ -5,7 +5,7 @@ import { MarkerLayer } from "./MarkerLayer";
 import { MapLoadFallback } from "./MapLoadFallback";
 import { ZoomControl } from "./ZoomControl";
 import { FilterControl } from "./FilterControl";
-import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
+import { GOOGLE_MIN_ZOOM, GOOGLE_MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
 import playfulStyle from "../mapStyles/playful.json";
 import natureStyle from "../mapStyles/nature.json";
 
@@ -113,8 +113,8 @@ export function GoogleMapView() {
     <APIProvider key={attempt} apiKey={apiKey} language={GOOGLE_MAPS_LANGUAGE[language]}>
       <Map
         defaultBounds={{ ...SLOVAKIA_BOUNDS, padding: MAP_BOUNDS_PADDING }}
-        minZoom={MIN_ZOOM}
-        maxZoom={MAX_ZOOM}
+        minZoom={GOOGLE_MIN_ZOOM}
+        maxZoom={GOOGLE_MAX_ZOOM}
         // Raster maps (the default render type here — no mapId/vector
         // opt-in) default isFractionalZoomEnabled to false, so fitBounds()
         // snaps to the nearest *lower* integer zoom and leaves noticeably
