@@ -60,9 +60,16 @@ const PLAYFUL: StylePalette = {
   // Google's much lighter paper-white base with terrain as subtle shading.
   // Kept barely-tinted here instead, close to `background`, so lilac shows
   // up as an accent (buildings, roads, boundaries) rather than as the
-  // dominant color of the entire viewport.
+  // dominant color of the entire viewport. terrain and terrainAlt used to
+  // differ slightly — at high zoom TomTom's landcover is actually dozens of
+  // small adjacent polygons (fields, built-up patches, natural cover), each
+  // its own fill layer, and any two-tone split between them shows up as a
+  // visible patchwork/seam between neighboring polygons. Same color for
+  // both eliminates that; see applyMapLibreStyleOverrides' explicit
+  // fill-opacity:1 for the other half of the fix (pre-existing per-layer
+  // opacity differences were doing the same thing to a single color).
   terrain: "#faf6fc",
-  terrainAlt: "#f3e6f2",
+  terrainAlt: "#faf6fc",
   building: "#e9d6f5",
   buildingOutline: "#c9a0e0",
   roadLocalFill: "#ffffff",
@@ -83,8 +90,11 @@ const NATURE: StylePalette = {
   water: "#6bb3c9",
   park: "#4fae72",
   parkOutline: "#1f6d4c",
+  // Same color for both — see the PLAYFUL palette's comment above for why
+  // (a terrain/terrainAlt split shows up as a visible seam between
+  // TomTom's many small adjacent landcover polygons at high zoom).
   terrain: "#d9f0e1",
-  terrainAlt: "#9fdcb0",
+  terrainAlt: "#d9f0e1",
   building: "#e3ead9",
   buildingOutline: "#b9c9a9",
   roadLocalFill: "#ffffff",
@@ -196,39 +206,60 @@ export function applyMapLibreStyleOverrides(map: maplibregl.Map, styleId: MapSty
           map.setPaintProperty(layer.id, "background-color", palette.background);
           break;
         case "water":
-          if (layerType === "fill") map.setPaintProperty(layer.id, "fill-color", palette.water);
-          else if (layerType === "line") map.setPaintProperty(layer.id, "line-color", palette.water);
+          if (layerType === "fill") {
+            map.setPaintProperty(layer.id, "fill-color", palette.water);
+            map.setPaintProperty(layer.id, "fill-opacity", 1);
+          } else if (layerType === "line") {
+            map.setPaintProperty(layer.id, "line-color", palette.water);
+          }
           break;
         case "park":
-          if (layerType === "fill") map.setPaintProperty(layer.id, "fill-color", palette.park);
-          else if (layerType === "line") map.setPaintProperty(layer.id, "line-color", palette.parkOutline);
+          if (layerType === "fill") {
+            map.setPaintProperty(layer.id, "fill-color", palette.park);
+            map.setPaintProperty(layer.id, "fill-opacity", 1);
+          } else if (layerType === "line") {
+            map.setPaintProperty(layer.id, "line-color", palette.parkOutline);
+          }
           break;
         case "terrain":
+          // Explicit fill-opacity:1 matters as much as the color here — the
+          // "patchwork" reported after the first color-only fix turned out
+          // to be pre-existing per-layer opacity differences (TomTom's own
+          // style renders some landcover sub-classes at less than full
+          // opacity) letting the white base show through unevenly under an
+          // otherwise-identical fill-color, which reads as a seam/gap.
           if (layerType === "fill") {
             map.setPaintProperty(
               layer.id,
               "fill-color",
               idLower.includes("earth cover") ? palette.terrainAlt : palette.terrain,
             );
+            map.setPaintProperty(layer.id, "fill-opacity", 1);
           }
           break;
         case "building":
           if (layerType === "fill") {
             map.setPaintProperty(layer.id, "fill-color", isCasing ? palette.buildingOutline : palette.building);
+            map.setPaintProperty(layer.id, "fill-opacity", 1);
           }
           break;
         case "roadHighway":
           if (layerType === "line") {
             map.setPaintProperty(layer.id, "line-color", isCasing ? palette.roadHighwayCasing : palette.roadHighwayFill);
+            map.setPaintProperty(layer.id, "line-opacity", 1);
           }
           break;
         case "roadLocal":
           if (layerType === "line") {
             map.setPaintProperty(layer.id, "line-color", isCasing ? palette.roadLocalCasing : palette.roadLocalFill);
+            map.setPaintProperty(layer.id, "line-opacity", 1);
           }
           break;
         case "adminBoundary":
-          if (layerType === "line") map.setPaintProperty(layer.id, "line-color", palette.adminBoundary);
+          if (layerType === "line") {
+            map.setPaintProperty(layer.id, "line-color", palette.adminBoundary);
+            map.setPaintProperty(layer.id, "line-opacity", 1);
+          }
           break;
         case "label":
           map.setPaintProperty(
