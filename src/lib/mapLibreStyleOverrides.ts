@@ -14,7 +14,10 @@ import type { MapStyleId } from "../store/useAppStore";
 // for Google (water, park, terrain, building, road tiers, admin boundary,
 // labels), and recolors each bucket with setPaintProperty. Re-run any time
 // the style (re)loads — these are live paint overrides, not a persisted
-// style document, so they don't survive a fresh style fetch.
+// style document, so they don't survive a fresh style fetch. The same
+// classifier also backs applyMapLibreLayerVisibility below, which drives the
+// road/place/mountain/water label toggles in MapLayerSettings — the
+// MapLibre equivalent of GoogleMapView's HIDE_*_STYLE stylers.
 
 interface StylePalette {
   background: string;
@@ -35,28 +38,31 @@ interface StylePalette {
   labelHalo: string;
 }
 
-// Same palette as src/mapStyles/playful.json, translated to MapLibre's
-// fill-color/line-color model — bubblegum-pink highways, candy-pink road
-// casings, and pastel-pink buildings for a storybook/fairytale feel that
-// reads well to kids, per the explicit "more for family kids, like
-// fairytale" brief.
+// Same palette as src/mapStyles/playful.json (kept byte-for-byte in sync so
+// Google and TomTom read as the same "skin"), translated to MapLibre's
+// fill-color/line-color model — leans lilac/rosa on top of the bubblegum-pink
+// highways: periwinkle water, pink-tinted terrain, lilac buildings, and a
+// purple admin-boundary/label-ink tone (the same #9b6fd1 used for the
+// historical-building category elsewhere in the app) for a storybook/
+// fairytale feel that reads well to kids, per the explicit "more for family
+// kids, like fairytale" brief and the follow-up "more lila/rosa" request.
 const PLAYFUL: StylePalette = {
-  background: "#f6f8f4",
-  water: "#4c7de0",
+  background: "#f8f5fb",
+  water: "#7b86e0",
   park: "#2fae66",
   parkOutline: "#1f6d4c",
-  terrain: "#f3f0e6",
-  terrainAlt: "#e8dcc0",
-  building: "#ffe3ef",
-  buildingOutline: "#f3a6c9",
+  terrain: "#f5e9f2",
+  terrainAlt: "#e9d3ea",
+  building: "#e9d6f5",
+  buildingOutline: "#c9a0e0",
   roadLocalFill: "#ffffff",
-  roadLocalCasing: "#f3d9e6",
+  roadLocalCasing: "#f0d9f0",
   roadHighwayFill: "#ec5fa3",
-  roadHighwayCasing: "#b8407a",
+  roadHighwayCasing: "#a34a9c",
   roadHighwayLabel: "#ffffff",
-  adminBoundary: "#b8407a",
-  labelText: "#3c544a",
-  labelHalo: "#f6f8f4",
+  adminBoundary: "#9b6fd1",
+  labelText: "#4a3a5c",
+  labelHalo: "#f8f5fb",
 };
 
 // Same palette as src/mapStyles/nature.json — teal water, forest-green
@@ -211,6 +217,59 @@ export function applyMapLibreStyleOverrides(map: maplibregl.Map, styleId: MapSty
       // icon-only symbol layer has no text-field, so text-color is a no-op
       // MapLibre may reject) — skip that one layer rather than aborting the
       // whole pass over everything else.
+    }
+  }
+}
+
+export interface MapLibreLayerVisibility {
+  showRoads: boolean;
+  showPlaceLabels: boolean;
+  showMountainLabels: boolean;
+  showWaterLabels: boolean;
+}
+
+// Which of the four toggles a "label" layer belongs to — reuses the same
+// keyword-classification approach as the recolor pass above, since TomTom's
+// label layer ids aren't fully enumerable ahead of time either. Anything
+// that doesn't match a more specific bucket defaults to "place" (city/town/
+// country names etc.), same as Google's plain `administrative.locality`
+// toggle covers the general case.
+function classifyLabelToggle(idLower: string): keyof MapLibreLayerVisibility {
+  if (/road|route|shield|highway/.test(idLower)) return "showRoads";
+  if (/water|lake|river|ocean|sea/.test(idLower)) return "showWaterLabels";
+  if (/mountain|peak|summit|elevation/.test(idLower)) return "showMountainLabels";
+  return "showPlaceLabels";
+}
+
+// Mirrors GoogleMapView's HIDE_ROADS_STYLE / HIDE_*_LABELS_STYLE stylers,
+// using MapLibre's visibility layout property instead of a Google styler
+// rule. Reads the *current* map.getStyle().layers each call (not a cached
+// list), same reasoning as applyMapLibreStyleOverrides — this needs to work
+// against whatever TomTom actually shipped, not a static snapshot.
+export function applyMapLibreLayerVisibility(map: maplibregl.Map, visibility: MapLibreLayerVisibility): void {
+  const style = map.getStyle();
+  if (!style?.layers) return;
+
+  for (const layer of style.layers) {
+    const layerType = layer.type;
+    const sourceLayer = "source-layer" in layer ? ((layer["source-layer"] as string | undefined) ?? "") : "";
+    const idLower = layer.id.toLowerCase();
+    const category = classify(layer.id, sourceLayer, layerType);
+
+    let visible: boolean | null = null;
+    if (category === "roadHighway" || category === "roadLocal") {
+      visible = visibility.showRoads;
+    } else if (category === "label") {
+      visible = visibility[classifyLabelToggle(idLower)];
+    }
+
+    if (visible === null) continue;
+
+    try {
+      map.setLayoutProperty(layer.id, "visibility", visible ? "visible" : "none");
+    } catch {
+      // Same reasoning as applyMapLibreStyleOverrides — skip layers that
+      // don't accept a "visibility" layout change rather than aborting.
     }
   }
 }

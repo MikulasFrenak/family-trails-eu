@@ -127,8 +127,9 @@ export function MapLayerSettings() {
               </div>
             )}
 
-            {/* Map type + label toggles are Google-specific (styles.json
-                stylers) — MapLibreMapView doesn't read any of this state. */}
+            {/* Map type (terrain/roadmap/satellite) is Google-only — it maps
+                to Google's mapTypeId prop, which MapLibre has no equivalent
+                for (TomTom's basic_main is always a street-map style). */}
             {mapProvider === "google" && (
               <>
                 <p className="px-2 pb-1 pt-1 font-display text-sm font-semibold">{t("mapLayers.mapView")}</p>
@@ -148,31 +149,28 @@ export function MapLayerSettings() {
                     </button>
                   ))}
                 </div>
-
-                <p className="px-2 pb-1 pt-2 font-display text-sm font-semibold">{t("mapLayers.title")}</p>
-                {isSatellite && (
-                  <p className="px-2 pb-2 text-xs text-brand-ink-soft">{t("mapLayers.satelliteNote")}</p>
-                )}
-                <div className={isSatellite ? "pointer-events-none opacity-40" : undefined}>
-                  <ToggleRow label={t("mapLayers.roads")} checked={showRoads} onChange={setShowRoads} />
-                  <ToggleRow
-                    label={t("mapLayers.placeNames")}
-                    checked={showPlaceLabels}
-                    onChange={setShowPlaceLabels}
-                  />
-                  <ToggleRow
-                    label={t("mapLayers.mountains")}
-                    checked={showMountainLabels}
-                    onChange={setShowMountainLabels}
-                  />
-                  <ToggleRow
-                    label={t("mapLayers.rivers")}
-                    checked={showWaterLabels}
-                    onChange={setShowWaterLabels}
-                  />
-                </div>
               </>
             )}
+
+            {/* Road/label toggles apply to both providers now: Google reads
+                them via HIDE_*_STYLE stylers in GoogleMapView, MapLibre via
+                setLayoutProperty in StyleOverrideMapLibre /
+                applyMapLibreLayerVisibility. isSatellite dimming stays
+                Google-only since "satellite" isn't a MapLibre concept. */}
+            <p className="px-2 pb-1 pt-2 font-display text-sm font-semibold">{t("mapLayers.title")}</p>
+            {mapProvider === "google" && isSatellite && (
+              <p className="px-2 pb-2 text-xs text-brand-ink-soft">{t("mapLayers.satelliteNote")}</p>
+            )}
+            <div className={mapProvider === "google" && isSatellite ? "pointer-events-none opacity-40" : undefined}>
+              <ToggleRow label={t("mapLayers.roads")} checked={showRoads} onChange={setShowRoads} />
+              <ToggleRow label={t("mapLayers.placeNames")} checked={showPlaceLabels} onChange={setShowPlaceLabels} />
+              <ToggleRow
+                label={t("mapLayers.mountains")}
+                checked={showMountainLabels}
+                onChange={setShowMountainLabels}
+              />
+              <ToggleRow label={t("mapLayers.rivers")} checked={showWaterLabels} onChange={setShowWaterLabels} />
+            </div>
           </div>
         </>
       )}
