@@ -7,17 +7,19 @@ import { MarkerLayerMapLibre } from "./MarkerLayerMapLibre";
 import { ZoomControlMapLibre } from "./ZoomControlMapLibre";
 import { FilterControl } from "./FilterControl";
 import { StyleOverrideMapLibre } from "./StyleOverrideMapLibre";
-import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS_MAPLIBRE, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
+import { MIN_ZOOM, MAX_ZOOM, SLOVAKIA_BOUNDS_MAPLIBRE, MAP_BOUNDS_PADDING, MIN_ZOOM_MOBILE } from "../lib/mapConstants";
 import { MAPLIBRE_PROVIDERS, DEFAULT_MAPLIBRE_PROVIDER_ID } from "../lib/mapLibreProviders";
 import { ensureMapLibreHillshade } from "../lib/mapLibreHillshade";
 import { applyMapLibreLayerVisibility, applyMapLibreStyleOverrides } from "../lib/mapLibreStyleOverrides";
 import { useAppStore } from "../store/useAppStore";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const LOAD_TIMEOUT_MS = 15000;
 
 const provider = MAPLIBRE_PROVIDERS[DEFAULT_MAPLIBRE_PROVIDER_ID];
 
 export function MapLibreMapView() {
+  const isMobile = useIsMobile();
   const apiKey = import.meta.env[provider.apiKeyEnvVar] as string | undefined;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [map, setMap] = useState<maplibregl.Map | null>(null);
@@ -51,7 +53,7 @@ export function MapLibreMapView() {
       style: provider.styleUrl(apiKey),
       bounds: SLOVAKIA_BOUNDS_MAPLIBRE,
       fitBoundsOptions: { padding: MAP_BOUNDS_PADDING },
-      minZoom: MIN_ZOOM,
+      minZoom: isMobile ? MIN_ZOOM_MOBILE : MIN_ZOOM,
       maxZoom: MAX_ZOOM,
     });
 
