@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Interactive, family/kid-friendly map of castles, historical sites, nature spots, ZOOs, and family parks across Czechia and Slovakia (Poland/Hungary planned later). Built with React + Google Maps JavaScript API, deployed on Cloudflare Pages.",
+  "description": "Interactive, family/kid-friendly map of castles, historical sites, nature spots, ZOOs, and family parks across Czechia and Slovakia (Poland/Hungary planned later). Built with React + Google Maps JavaScript API, deployed on Cloudflare Workers.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MikulasFrenak/family-trails-eu.git"
