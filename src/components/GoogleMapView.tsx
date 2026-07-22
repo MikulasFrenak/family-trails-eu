@@ -5,7 +5,8 @@ import { MarkerLayer } from "./MarkerLayer";
 import { MapLoadFallback } from "./MapLoadFallback";
 import { ZoomControl } from "./ZoomControl";
 import { FilterControl } from "./FilterControl";
-import { GOOGLE_MIN_ZOOM, GOOGLE_MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
+import { GOOGLE_MIN_ZOOM, GOOGLE_MIN_ZOOM_MOBILE, GOOGLE_MAX_ZOOM, SLOVAKIA_BOUNDS, MAP_BOUNDS_PADDING } from "../lib/mapConstants";
+import { useIsMobile } from "../hooks/useIsMobile";
 import playfulStyle from "../mapStyles/playful.json";
 import natureStyle from "../mapStyles/nature.json";
 
@@ -53,6 +54,7 @@ declare global {
 
 export function GoogleMapView() {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const isMobile = useIsMobile();
   const mapStyle = useAppStore((s) => s.mapStyle);
   const mapTypeId = useAppStore((s) => s.mapTypeId);
   const language = useAppStore((s) => s.language);
@@ -99,7 +101,7 @@ export function GoogleMapView() {
     <APIProvider key={attempt} apiKey={apiKey} language={GOOGLE_MAPS_LANGUAGE[language]}>
       <Map
         defaultBounds={{ ...SLOVAKIA_BOUNDS, padding: MAP_BOUNDS_PADDING }}
-        minZoom={GOOGLE_MIN_ZOOM}
+        minZoom={isMobile ? GOOGLE_MIN_ZOOM_MOBILE : GOOGLE_MIN_ZOOM}
         maxZoom={GOOGLE_MAX_ZOOM}
         isFractionalZoomEnabled
         mapTypeId={mapTypeId}

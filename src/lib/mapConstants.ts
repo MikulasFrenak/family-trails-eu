@@ -2,6 +2,7 @@ export const MIN_ZOOM = 6;
 export const MAX_ZOOM = 18;
 
 export const GOOGLE_MIN_ZOOM = MIN_ZOOM + 1;
+export const GOOGLE_MIN_ZOOM_MOBILE = MIN_ZOOM;
 export const GOOGLE_MAX_ZOOM = MAX_ZOOM;
 
 export const SLOVAKIA_BOUNDS: google.maps.LatLngBoundsLiteral = {
