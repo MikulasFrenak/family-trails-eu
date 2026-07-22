@@ -125,9 +125,9 @@ This is a personal project on a hard-capped free-tier Google Cloud quota (see Ph
 | 2 | CZ + SK curated dataset v1 (aim for ~15–20 solid POIs per country to start) | ✅ Done — 16 CZ + 31 SK, exceeded target |
 | 3 | Custom marker icon set, 2nd/3rd map style, POI detail panel UX pass | ✅ Done — 2 styles (not 3), pin-shaped icons, clustering, settings panel went beyond original scope |
 | 4 | i18n: EN/SK/CZ, browser detection, switcher | ✅ Done — plus Google Map's own labels now localize too |
-| 5 | Places search box + standard map controls | ⬜ Not started — standard controls deliberately dropped instead (see §2) |
-| 6 | Cloudflare deploy, custom domain (optional) | ✅ Done (deploy) — live on Cloudflare Workers, git-connected auto-deploy; `wrangler.jsonc` now version-controlled (PR #7). Custom domain still ⬜ not started |
-| 7 | Link from `review-spa` as a showcase entry; `public-repo-check` final pass | ⬜ Not started |
+| 5 | Search over POIs + search over map; standard map controls | ⬜ Not started — revived, rescoped as §9 items 1–2. Standard map controls (street view, fullscreen, etc.) still deliberately dropped (see §2) |
+| 6 | Cloudflare deploy | ✅ Done — live on Cloudflare Workers, git-connected auto-deploy; `wrangler.jsonc` now version-controlled (PR #7). Staying on the default `workers.dev` subdomain — no custom domain planned |
+| 7 | Link from `review-spa` as a showcase entry; `public-repo-check` final pass | ✅ Done — showcase entry + embedded live case study in `review-spa` (`Work.tsx`, `CaseStudy.tsx`, translations); repo scan found no secrets/keys or personal paths, `.env*` properly gitignored |
 
 Each phase maps to the playbook's `feature-delivery` workflow at the task level: `create-task` → `implement-task` → `verify-browser` → `commit`/`pr-update` → `code-doc`.
 
@@ -137,7 +137,7 @@ Each phase maps to the playbook's `feature-delivery` workflow at the task level:
 
 - ~~Styling approach~~ — **decided: Tailwind** (see `AGENTS.md`). Both Tailwind and CSS Modules are compile-time/zero-runtime; Tailwind wins on DX for this marker-heavy map UI. styled-components/inline styles ruled out due to runtime re-render cost on `MarkerLayer`.
 - ~~Branching/commits~~ — **decided**: `feature/`, `bugfix/`, `chore/`, `trivial/` prefixes, no ticket-ID prefix (see `AGENTS.md`).
-- Custom domain for Cloudflare Pages vs default `*.pages.dev` — not blocking, decide at Phase 6.
+- ~~Custom domain~~ — **decided: no**. Staying on the default `workers.dev` subdomain.
 
 ---
 
@@ -151,13 +151,13 @@ Data layer is already country-keyed (`/data/poi/pl.json`, `hu.json`) and i18n is
 
 Captured for later — none of this is designed or scoped yet, just named as a direction. Picking any of these up is a real architecture conversation first, not a straight implementation task, because together they push the project past "static site + curated JSON" (see `AGENTS.md` scope) into needing user accounts and a backend:
 
-- **Sign in / Login** — some auth mechanism (email + password, or "Sign in with Google" OAuth). Needed before any of the below can exist per-user.
-- **Like / Dislike POI** — a signed-in user can react to a place; needs somewhere to store that (per-user, per-POI).
-- **Add POI** — user-submitted places. Needs a moderation/review step before anything user-submitted lands in the public curated dataset (quality bar established in Phase 2 shouldn't erode).
-- **Edit POI** — user-suggested corrections/edits to existing entries. Same moderation concern as Add POI.
-- **Observability** — analytics/monitoring/logging once there's a backend and real user actions to observe (not meaningful for the current static MVP beyond basic Cloudflare Pages request logs).
+- **Sign in / Login** — some auth mechanism (email + password, or "Sign in with Google" OAuth). Needed before any per-user, cross-device, or shared-dataset version of the below could exist.
+- **Edit POI (shared dataset)** — user-suggested corrections landing in the shared public curated dataset. Needs a moderation/review step (quality bar established in Phase 2 shouldn't erode). Not scoped yet.
+- **Observability** — analytics/monitoring/logging once there's a backend and real user actions to observe (not meaningful for the current static MVP beyond basic Cloudflare Workers request logs).
 
-Architecture implication when this gets picked up: needs an auth provider (e.g. Clerk/Supabase Auth/Firebase Auth, or Cloudflare's own stack) and a real backend + database (e.g. Cloudflare Workers + D1, or Supabase) — a genuine scope and cost decision (see the earlier "$0 quota cap" constraint in Phase 0), not a Cloudflare Pages static-only extension.
+Architecture implication when this gets picked up: needs an auth provider (e.g. Clerk/Supabase Auth/Firebase Auth, or Cloudflare's own stack) and a real backend + database (e.g. Cloudflare Workers + D1, or Supabase) — a genuine scope and cost decision (see the earlier "$0 quota cap" constraint in Phase 0), not a static-only extension.
+
+Like/Dislike, Add-POI, and Edit-your-own-POI are no longer blocked on this — see §9, which scopes all three down to a `localStorage`-only, no-auth, personal-device version instead.
 
 ---
 
@@ -259,3 +259,18 @@ Google's `@googlemaps/markerclusterer` (`SuperClusterAlgorithm`) rounds fraction
 Google's JS API and MapLibre don't share a zoom scale 1:1 for the same visual scale — `GOOGLE_MIN_ZOOM`/`GOOGLE_MAX_ZOOM` are Google's own empirically-tuned copies of `MIN_ZOOM`/`MAX_ZOOM`, not shared constants; the exact offset (`MIN_ZOOM + 1`) was settled by live visual testing, not derived from a formula. `isFractionalZoomEnabled` is also on for Google so its `fitBounds()` framing matches MapLibre's continuous zoom instead of snapping to whole integers.
 
 `src/lib/mapLibreHillshade.ts` adds real shaded-relief terrain to the TomTom view (Google gets this for free via `mapTypeId="terrain"`). TomTom's "Hillshade Tile" endpoint returns raw elevation data using the same encoding as Mapbox's Terrain-RGB format (`height = -10000 + (R*256*256 + G*256 + B) * 0.1`), so MapLibre's built-in `raster-dem` source (`encoding: "mapbox"`) decodes it natively; the layer is inserted just before the first water-looking layer so shading sits above flat land fills but below water/roads/labels.
+
+---
+
+## 9. Next up (agreed direction, not yet designed/scoped)
+
+Six items, none started yet — captured here as the agreed next round, in no particular priority order. None of this requires the auth+backend jump §7 describes; items 4–6 are deliberately scoped down to personal-device-only via `localStorage` instead.
+
+1. **Search over POIs** — search/filter the existing curated dataset by name (client-side, no new API/service — the data's already loaded).
+2. **Search over map** — location/address search (geocoding), revives Phase 5. Needs a per-provider approach: Google Places Autocomplete for the Google view, a MapLibre-side equivalent for TomTom (e.g. TomTom's own Search API, or an OSM/Nominatim-based geocoder) — not shared code between the two, same reasoning as the rest of the provider split (see §8).
+3. **MapTiler as a second MapLibre provider** — already tracked as an open question in §8; add it as a second entry in `src/lib/mapLibreProviders.ts` alongside TomTom.
+4. **Like / Dislike POI** — a per-POI reaction, persisted to `localStorage` on the visiting device. No auth, no backend, not shared across devices or with other visitors.
+5. **Create own POI** — user adds a personal POI pin, persisted to `localStorage`. Private to that device/browser — not submitted to or moderated into the shared curated dataset (`/data/poi/*.json` stays curated-only).
+6. **Edit POI** — of your own locally-created POIs from item 5 only (rename, move, recategorize, delete) — not corrections to the shared curated dataset, which is the separate, still-unscoped §7 item requiring moderation.
+
+Once this gets picked up for real, the first design question is where items 4–6 live in the data model: likely a `localStorage`-backed slice of `useAppStore` (own custom POIs + reactions merged into the rendered `ALL_POIS` list at read time), not a new backend concept — worth confirming against the existing store shape before implementation starts.
