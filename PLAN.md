@@ -127,7 +127,7 @@ This is a personal project on a hard-capped free-tier Google Cloud quota (see Ph
 | 4 | i18n: EN/SK/CZ, browser detection, switcher | ✅ Done — plus Google Map's own labels now localize too |
 | 5 | Places search box + standard map controls | ⬜ Not started — standard controls deliberately dropped instead (see §2) |
 | 6 | Cloudflare deploy | ✅ Done — live on Cloudflare Workers, git-connected auto-deploy; `wrangler.jsonc` now version-controlled (PR #7). Staying on the default `workers.dev` subdomain — no custom domain planned |
-| 7 | Link from `review-spa` as a showcase entry; `public-repo-check` final pass | ⬜ Not started |
+| 7 | Link from `review-spa` as a showcase entry; `public-repo-check` final pass | ✅ Done — showcase entry + embedded live case study in `review-spa` (`Work.tsx`, `CaseStudy.tsx`, translations); repo scan found no secrets/keys or personal paths, `.env*` properly gitignored |
 
 Each phase maps to the playbook's `feature-delivery` workflow at the task level: `create-task` → `implement-task` → `verify-browser` → `commit`/`pr-update` → `code-doc`.
 
