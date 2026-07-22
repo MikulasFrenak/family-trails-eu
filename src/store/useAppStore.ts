@@ -52,7 +52,7 @@ export const useAppStore = create<AppState>((set) => ({
   country: "CZ",
   language: getInitialLanguage(),
   mapProvider: getInitialMapProvider(),
-  mapStyle: "playful",
+  mapStyle: "nature",
   mapTypeId: "terrain",
   activeCategories: [],
   selectedPoiId: null,
