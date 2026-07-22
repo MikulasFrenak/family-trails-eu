@@ -126,7 +126,7 @@ This is a personal project on a hard-capped free-tier Google Cloud quota (see Ph
 | 3 | Custom marker icon set, 2nd/3rd map style, POI detail panel UX pass | ✅ Done — 2 styles (not 3), pin-shaped icons, clustering, settings panel went beyond original scope |
 | 4 | i18n: EN/SK/CZ, browser detection, switcher | ✅ Done — plus Google Map's own labels now localize too |
 | 5 | Places search box + standard map controls | ⬜ Not started — standard controls deliberately dropped instead (see §2) |
-| 6 | Cloudflare Pages deploy, custom domain (optional) | ⬜ Not started |
+| 6 | Cloudflare deploy, custom domain (optional) | ✅ Done (deploy) — live on Cloudflare Workers, git-connected auto-deploy; `wrangler.jsonc` now version-controlled (PR #7). Custom domain still ⬜ not started |
 | 7 | Link from `review-spa` as a showcase entry; `public-repo-check` final pass | ⬜ Not started |
 
 Each phase maps to the playbook's `feature-delivery` workflow at the task level: `create-task` → `implement-task` → `verify-browser` → `commit`/`pr-update` → `code-doc`.

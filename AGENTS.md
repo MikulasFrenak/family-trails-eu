@@ -42,10 +42,10 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
 ## Stack Decisions
 
 - React 19 + TypeScript + Vite
-- Two map engines behind a `mapProvider` store switch, Google by default: Google Maps JavaScript API via `@vis.gl/react-google-maps` (clustering via `@googlemaps/markerclusterer`), or `maplibre-gl` for vector-tile providers (TomTom only for now — see `src/lib/mapLibreProviders.ts` and `PLAN.md` §8; MapLibre's own GeoJSON-source clustering + HTML markers, no separate clustering library). `GoogleMapView.tsx` is kept deliberately unmodified/clean; provider-specific logic never leaks into it.
+- Two map engines behind a `mapProvider` store switch, Google by default: Google Maps JavaScript API via `@vis.gl/react-google-maps` (clustering via `@googlemaps/markerclusterer`), or `maplibre-gl` for vector-tile providers (TomTom only for now — see `src/lib/mapLibreProviders.ts` and `PLAN.md` §8; clustering on this side runs its own `supercluster` instance in `MarkerLayerMapLibre.tsx`, matching Google's clustering algorithm — see `PLAN.md` §8). `GoogleMapView.tsx` is kept deliberately unmodified/clean; provider-specific logic never leaks into it.
 - `react-i18next` + `i18next-browser-languagedetector`
 - Zustand for global state (country, language, map provider, map style, map type, category filters, layer-visibility toggles)
-- Cloudflare Pages for hosting
+- Cloudflare Workers (static assets) for hosting, config version-controlled in `wrangler.jsonc`
 - Vitest (jsdom) for unit tests — pure logic/hooks only, see `PLAN.md` §2 Testing
 
 **Styling approach: Tailwind.** Chosen over CSS Modules and styled-components — both Tailwind and CSS Modules compile to static CSS with no runtime cost, but Tailwind wins on DX for a marker-heavy map UI (consistent spacing/sizing utilities across `MapView`/`CategoryFilter`/`POIDetailPanel` without hand-writing many small `.module.css` files). styled-components/inline styles were ruled out: `MarkerLayer` re-renders on filter/category changes, and runtime CSS-in-JS or inline style objects add per-render overhead that scales with marker count. Don't let a second approach creep in once picked.
