@@ -81,6 +81,8 @@ Summary (imperative, max 72 chars)
 
 `main` is never committed to directly. Squash-merge PRs, auto-delete source branch after merge.
 
+**One open branch/PR at a time.** Before starting new work, check for a branch or PR already open for related (or even unrelated-but-touching-the-same-files) work — land the new change as another commit on that branch instead of opening a second one. Parallel branches over the same files just manufacture merge conflicts once both try to land; a new branch starts only once the previous one has merged.
+
 ---
 
 ## Capabilities
