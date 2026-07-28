@@ -14,13 +14,11 @@ function getInitialLanguage(): Language {
 
 const MAP_PROVIDER_STORAGE_KEY = "family-trails:mapProvider";
 
+// TomTom is temporarily blocking/not responding -- force "google" regardless of what's
+// stored, so anyone who'd previously picked "maplibre" doesn't get stuck on a broken map
+// with the switcher hidden and no way back. Revert together with the switcher in App.tsx.
 function getInitialMapProvider(): MapProvider {
-  try {
-    const stored = localStorage.getItem(MAP_PROVIDER_STORAGE_KEY);
-    return stored === "google" || stored === "maplibre" ? stored : "google";
-  } catch {
-    return "google";
-  }
+  return "google";
 }
 
 interface AppState {

@@ -24,7 +24,8 @@ export default function App() {
         <div className="flex items-center gap-2 sm:gap-3">
           {!isMobile && (
             <div className="flex items-center gap-2 sm:gap-3">
-              {!isCompact && <MapProviderSwitcher />}
+              {/* Temporarily hidden: TomTom is blocking/not responding. Re-enable once resolved. */}
+              {false && !isCompact && <MapProviderSwitcher />}
               <StyleSwitcher />
               <LanguageSwitcher />
             </div>
