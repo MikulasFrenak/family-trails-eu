@@ -1,6 +1,6 @@
 # Self-healing selectors
 
-Scaffolding that lets one pilot Playwright spec (`e2e/category-filter.spec.ts`, key `category-filter.zoo-chip`) survive a selector rename without going red, by re-locating the target element from a committed DOM fingerprint instead of failing outright.
+Scaffolding that lets a Playwright locator survive a selector rename without going red, by re-locating the target element from a committed DOM fingerprint instead of failing outright. Wired into `e2e/category-filter.spec.ts` (key `category-filter.zoo-chip`) and `e2e/language-switcher.spec.ts` (keys `language-switcher.heading`, `.cz-button`, `.en-button`).
 
 ## Scope boundary
 
@@ -23,4 +23,4 @@ This covers **selector drift only** — a locator breaking because the element's
 
 ## Known limitation
 
-Candidate generation queries the whole page for same-tag, visible elements — for a low-selectivity fingerprint (short text, no distinguishing siblings) on a page with many similar elements, this can still produce weak-but-passing-threshold matches. Start narrow (as this scaffold does — one spec, one locator) before wiring more locators through `healingLocator`.
+Candidate generation queries the whole page for same-tag, visible elements — for a low-selectivity fingerprint (short text, no distinguishing siblings) on a page with many similar elements, this can still produce weak-but-passing-threshold matches. Keep new locators through `healingLocator` narrow and deliberate rather than blanket-converting every locator in the suite at once.
