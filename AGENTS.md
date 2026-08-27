@@ -35,6 +35,8 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
   validate-poi.ts # CI validation for /data/poi/*.json
 /e2e
   *.spec.ts       # Playwright specs against real user flows (dev server, real Google Maps key)
+  /lib            # self-healing selector scaffold (scorer.ts, fingerprint.ts, healingLocator.ts) — see lib/doc.md
+  /fingerprints   # committed known-good DOM fingerprints, refreshed on every passing run
 ```
 
 `SearchBox` is sketched in `PLAN.md` but not yet built (Phase 5, deferred). Standalone project, single package — no monorepo package map needed.
@@ -131,3 +133,4 @@ Run `/public-repo-check` before every push.
 3. Deployed on Cloudflare (Workers-with-static-assets, git-connected — auto-deploys on push to `main`); both `VITE_GOOGLE_MAPS_API_KEY` and `VITE_TOMTOM_MAPS_API_KEY` are **build-time** env vars there, not runtime secrets — Vite bakes `import.meta.env.VITE_*` into the bundle at build, so they must be set in the project's build-environment-variables settings (not "Variables and Secrets", which is Worker-runtime-only and won't affect the build).
 4. `npm install`, then put the real keys in `.env.local` (gitignored, never commit it) as `VITE_GOOGLE_MAPS_API_KEY=...` and `VITE_TOMTOM_MAPS_API_KEY=...`, then `npm run dev`.
 5. `npm run validate-poi` checks `/data/poi/*.json` against `data/schema.md`; `npm run build` runs a full typecheck + production build; `npm run test` runs the Vitest suite once, `npm run test:watch` for watch mode; `npm run test:e2e` runs the Playwright suite (spins up `npm run dev` itself — needs a real `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` and `npx playwright install chromium` once beforehand).
+6. `.github/workflows/test.yml` runs both suites on every PR to `main`. The e2e job reads `VITE_GOOGLE_MAPS_API_KEY` from a `VITE_GOOGLE_MAPS_API_KEY` **repo secret** (Settings → Secrets and variables → Actions) — add it there once; the current specs don't touch the map so CI passes even without it, but future map-dependent specs will need it set.
