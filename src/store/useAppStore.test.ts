@@ -60,7 +60,7 @@ describe("useAppStore", () => {
       useAppStore.getState().setMapProvider("maplibre");
       const state = useAppStore.getState();
       expect(state.mapProvider).toBe("maplibre");
-      expect(state.mapStyle).toBe("playful"); // untouched
+      expect(state.mapStyle).toBe("nature"); // untouched
     });
 
     it("selectPoi sets and clears the selected POI id", () => {
