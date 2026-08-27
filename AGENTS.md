@@ -33,6 +33,10 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
   schema.md
 /scripts
   validate-poi.ts # CI validation for /data/poi/*.json
+/e2e
+  *.spec.ts       # Playwright specs against real user flows (dev server, real Google Maps key)
+  /lib            # self-healing selector scaffold (scorer.ts, fingerprint.ts, healingLocator.ts) — see lib/doc.md
+  /fingerprints   # committed known-good DOM fingerprints, refreshed on every passing run
 ```
 
 `SearchBox` is sketched in `PLAN.md` but not yet built (Phase 5, deferred). Standalone project, single package — no monorepo package map needed.
@@ -47,6 +51,7 @@ See `PLAN.md` at repo root for the full product/architecture plan. This file is 
 - Zustand for global state (country, language, map provider, map style, map type, category filters, layer-visibility toggles)
 - Cloudflare Workers (static assets) for hosting, config version-controlled in `wrangler.jsonc`
 - Vitest (jsdom) for unit tests — pure logic/hooks only, see `PLAN.md` §2 Testing
+- Playwright (chromium) for E2E — real flows against `npm run dev` on `localhost:5173`, config in `playwright.config.ts`. Google Maps loads fine locally under the current key (no referrer block on localhost), so specs can drive real map-adjacent UI, not just chrome around it.
 
 **Styling approach: Tailwind.** Chosen over CSS Modules and styled-components — both Tailwind and CSS Modules compile to static CSS with no runtime cost, but Tailwind wins on DX for a marker-heavy map UI (consistent spacing/sizing utilities across `MapView`/`CategoryFilter`/`POIDetailPanel` without hand-writing many small `.module.css` files). styled-components/inline styles were ruled out: `MarkerLayer` re-renders on filter/category changes, and runtime CSS-in-JS or inline style objects add per-render overhead that scales with marker count. Don't let a second approach creep in once picked.
 
@@ -127,4 +132,5 @@ Run `/public-repo-check` before every push.
 2. TomTom Developer Portal account, API key from the Maps Display API (free tier: 50,000 tile requests/day). No referrer restriction UI as of writing — rely on the daily quota instead, same reasoning as the Google key.
 3. Deployed on Cloudflare (Workers-with-static-assets, git-connected — auto-deploys on push to `main`); both `VITE_GOOGLE_MAPS_API_KEY` and `VITE_TOMTOM_MAPS_API_KEY` are **build-time** env vars there, not runtime secrets — Vite bakes `import.meta.env.VITE_*` into the bundle at build, so they must be set in the project's build-environment-variables settings (not "Variables and Secrets", which is Worker-runtime-only and won't affect the build).
 4. `npm install`, then put the real keys in `.env.local` (gitignored, never commit it) as `VITE_GOOGLE_MAPS_API_KEY=...` and `VITE_TOMTOM_MAPS_API_KEY=...`, then `npm run dev`.
-5. `npm run validate-poi` checks `/data/poi/*.json` against `data/schema.md`; `npm run build` runs a full typecheck + production build; `npm run test` runs the Vitest suite once, `npm run test:watch` for watch mode.
+5. `npm run validate-poi` checks `/data/poi/*.json` against `data/schema.md`; `npm run build` runs a full typecheck + production build; `npm run test` runs the Vitest suite once, `npm run test:watch` for watch mode; `npm run test:e2e` runs the Playwright suite (spins up `npm run dev` itself — needs a real `VITE_GOOGLE_MAPS_API_KEY` in `.env.local` and `npx playwright install chromium` once beforehand).
+6. `.github/workflows/test.yml` runs both suites on every PR to `main`. The e2e job reads `VITE_GOOGLE_MAPS_API_KEY` from a `VITE_GOOGLE_MAPS_API_KEY` **repo secret** (Settings → Secrets and variables → Actions) — add it there once; the current specs don't touch the map so CI passes even without it, but future map-dependent specs will need it set.

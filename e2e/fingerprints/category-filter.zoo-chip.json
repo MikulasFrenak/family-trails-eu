@@ -1,0 +1,13 @@
+{
+  "text": "Zoo",
+  "tag": "button",
+  "domPath": "div > div > div:nth-of-type(2) > button:nth-of-type(1)",
+  "siblingText": [
+    "Zoo",
+    "Castle",
+    "Nature & trails",
+    "Museum",
+    "Historical site",
+    "Family park"
+  ]
+}
