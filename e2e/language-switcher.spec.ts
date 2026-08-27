@@ -1,16 +1,20 @@
 import { test, expect } from "@playwright/test";
+import { healingLocator } from "./lib/healingLocator";
 
 test("switches the UI language and persists it across reload", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Family Trails" })).toBeVisible();
+  const heading = await healingLocator(page, "language-switcher.heading", "h1");
+  await expect(heading).toHaveText("Family Trails");
 
-  await page.getByRole("button", { name: "cz", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Rodinné výlety" })).toBeVisible();
+  const czButton = await healingLocator(page, "language-switcher.cz-button", 'button:text-is("cz"):visible');
+  await czButton.click();
+  await expect(heading).toHaveText("Rodinné výlety");
 
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Rodinné výlety" })).toBeVisible();
+  await expect(heading).toHaveText("Rodinné výlety");
 
-  await page.getByRole("button", { name: "en", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Family Trails" })).toBeVisible();
+  const enButton = await healingLocator(page, "language-switcher.en-button", 'button:text-is("en"):visible');
+  await enButton.click();
+  await expect(heading).toHaveText("Family Trails");
 });
